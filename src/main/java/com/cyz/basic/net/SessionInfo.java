@@ -65,4 +65,11 @@ public class SessionInfo implements Serializable{
 	public void setMac(String mac) {
 		this.mac = mac;
 	}
+
+	@Override
+	public String toString() {
+		return "SessionInfo [id=" + id + ", username=" + username + ", ip=" + ip + ", token=" + token
+				+ ", availableDate=" + availableDate + ", mac=" + mac + ", resourceList=" + resourceList + "]";
+	}
+	
 }

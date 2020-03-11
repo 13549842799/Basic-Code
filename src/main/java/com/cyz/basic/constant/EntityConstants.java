@@ -29,5 +29,9 @@ public interface EntityConstants {
 			     return null;
 		 }
 	  }
+	  
+	  public static String tokenKey(int type, String username) {
+		  return loginConstant(type).concat("_").concat(username);
+	  }
 
 }
