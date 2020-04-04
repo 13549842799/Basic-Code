@@ -1,4 +1,4 @@
-package com.cyz.basic.net;
+package com.cyz.basic.web;
 
 import java.io.Serializable;
 import java.util.HashMap;

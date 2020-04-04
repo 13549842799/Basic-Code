@@ -41,7 +41,7 @@ public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T>
 	 * @throws Exception
 	 */
 	public T getById(long id) throws Exception{
-		T t = this.newEntity();
+		T t = this.newEntity(); 
 		if (t instanceof IdEntity) {
 			((IdEntity<?>)t).acceptId(id);			
 			return this.get(t);
@@ -55,6 +55,7 @@ public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T>
 	 * @return
 	 */
 	public List<T> getList(T t) {
+		fullDeleteSign(t);
 		return basicMapper.getList(t);
 	}
 	
@@ -99,7 +100,7 @@ public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T>
 	}
 	
 	/**
-	 * 
+	 * 为对象填充delflag = 1
 	 * @param t
 	 */
 	private void fullDeleteSign (T t) {
@@ -107,7 +108,7 @@ public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T>
 	}
 	
 	/**
-	 * 
+	 * 为对象填充delflag = 0
 	 * @param t
 	 */
 	private void fullDelSign(T t) {

@@ -1,5 +1,6 @@
 package com.cyz.basic.service.support;
 
+import com.cyz.basic.service.BasicService;
 
 /**
  *
@@ -7,6 +8,6 @@ package com.cyz.basic.service.support;
  *
  * @param <T>
  */
-public abstract class BasicServiceSupport<T>  {
+public abstract class BasicServiceSupport<T>  implements BasicService<T>{
     
 }

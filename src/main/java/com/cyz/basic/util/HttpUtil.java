@@ -13,6 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.util.Assert;
+
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -21,6 +26,10 @@ import com.alibaba.fastjson.JSONObject;
  *
  */
 public abstract class HttpUtil {
+	
+	private static final String JSON_TYPE = "application/json;charset=UTF-8";
+
+	private static final String TEXT_TYPE = "text/plain";
 	
 	public static Map<String, Object> request(String url, Map<String, String> params, Map<String, String> headers, String type, String responseType) {
 		switch (type) {
@@ -198,5 +207,92 @@ public abstract class HttpUtil {
 				e.printStackTrace();
 			}
     	}
+    }
+    
+    /**
+     * 
+     * @param params
+     * @throws IOException 
+     */
+    public static void responseResult(RespParams params) throws IOException {
+    	Assert.notNull(params, "params is null");
+    	
+    	HttpServletResponse resp = params.getResp();
+    	
+    	resp.setContentType(params.getContentType());
+    	
+    	if (params.hasExtraHeaders()) {
+    		for (String header : params.getExtraHeaders()) {
+    			String[] hs = header.split("=");
+    			if (hs.length != 2) {
+    				continue;
+    			}
+				resp.addHeader(hs[0], hs[1]);
+			}
+    	}
+
+		resp.getWriter().write(params.getContent().toString());
+		resp.getWriter().flush();
+
+    }
+    
+    public static class RespParams {
+    	
+    	private HttpServletRequest req;
+    	private HttpServletResponse resp;
+    	private String contentType = JSON_TYPE;
+    	private Object content;
+    	private String[] extraHeaders;
+    	
+    	public RespParams (HttpServletRequest req, HttpServletResponse resp) {
+    		Assert.notNull(req, "request is null");
+    		this.req = req;
+    		Assert.notNull(resp, "response is null");
+    		this.resp = resp;
+    	}
+    	
+    	public static RespParams create(HttpServletRequest req, HttpServletResponse resp) {
+    		return new RespParams(req, resp);
+    	}
+    	
+    	public RespParams contentType(String contentType) {
+    		this.contentType = contentType;
+    		return this;
+    	}
+    	
+    	public RespParams content(Object content) {
+    		this.content = content;
+    		return this;
+    	}
+    	
+    	public RespParams extraHeaders(String... extraHeaders) {
+    		this.extraHeaders = extraHeaders;
+    		return this;
+    	}
+
+		public HttpServletRequest getReq() {
+			return req;
+		}
+
+		public HttpServletResponse getResp() {
+			return resp;
+		}
+
+		public String getContentType() {
+			return contentType;
+		}
+
+		public Object getContent() {
+			return content;
+		}
+
+		public String[] getExtraHeaders() {
+			return extraHeaders;
+		}
+    	
+		public boolean hasExtraHeaders() {
+			return extraHeaders != null && extraHeaders.length > 0;
+		}
+    	
     }
 }
