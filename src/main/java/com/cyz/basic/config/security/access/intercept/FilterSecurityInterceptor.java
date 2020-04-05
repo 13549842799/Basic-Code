@@ -16,7 +16,7 @@ import com.cyz.basic.config.security.access.SecurityMetadataSource;
 import com.cyz.basic.config.security.web.FilterInvocation;
 
 
-public class CyzFilterSecurityInterceptor extends CyzAbstractSecurityInterceptor implements Filter {
+public class FilterSecurityInterceptor extends CyzAbstractSecurityInterceptor implements Filter {
 	
 	private static final String FILTER_APPLIED = "__spring_security_CyzfilterSecurityInterceptor_filterApplied";
 	

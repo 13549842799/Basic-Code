@@ -8,6 +8,7 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
+import com.cyz.basic.config.security.access.intercept.FilterSecurityInterceptor;
 import com.cyz.basic.config.security.authentication.AuthenticationManager;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -105,6 +106,24 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 		http = new HttpSecurity();
 		
 		return http;
+	}
+	
+	/**
+	 * Override this method to configure {@link WebSecurity}. For example, if you wish to
+	 * ignore certain requests.
+	 */
+	public void configure(WebSecurity web) throws Exception {
+	}
+	
+	public void init(final WebSecurity web) throws Exception {
+		final HttpSecurity http = getHttp();
+		/*web.addSecurityFilterChainBuilder(http).postBuildAction(new Runnable() {
+			public void run() {
+				FilterSecurityInterceptor securityInterceptor = http
+						.getSharedObject(FilterSecurityInterceptor.class);
+				web.securityInterceptor(securityInterceptor);
+			}
+		});*/
 	}
 
 }
