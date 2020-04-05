@@ -15,7 +15,9 @@ import org.springframework.core.type.AnnotationMetadata;
 
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.SecurityConfigurer;
+import com.cyz.basic.config.security.config.annotation.authentication.configuration.WebSecurityConfigurerAdapter;
 import com.cyz.basic.config.security.config.annotation.web.builders.WebSecurity;
+import com.cyz.basic.config.security.context.AbstractSecurityWebApplicationInitializer;
 import com.cyz.basic.config.security.context.DelegatingApplicationListener;
 
 
@@ -28,8 +30,16 @@ import com.cyz.basic.config.security.context.DelegatingApplicationListener;
  * configuration is imported when using {@link EnableWebSecurity}.
  * 
  * ImportAware接口必须配合@Configuration使用，它会有一个实现方法setImportMetadata,这个方法可以获取到注解上的参数。
+ * 
+ * BeanClassLoaderAware 的作用好像是获取到类加载器
  *
  *根据自身情况进行改造
+ *这个类是WebSecurity的配置类，
+ *主要做了以下的工作，包括
+ *实现了BeanClassLoaderAware接口来获取beanClassLoader，
+ *对DelegatingApplicationListener进行实例化并注入到Spring容器中（获取bean），这个DelegatingApplicationListener
+ *是对一个集合的SmartApplicationLitener的管理监听类。我们会把自己所有的事件监听类添加到这个管理类中。
+ *
  *
  * @see EnableWebSecurity
  * @see WebSecurity
@@ -59,6 +69,18 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 	public static DelegatingApplicationListener delegatingApplicationListener() {
 		return new DelegatingApplicationListener();
 	}
+	
+	@Bean(name = AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)
+	public Filter springSecurityFilterChain() throws Exception {
+		boolean hasConfigurers = webSecurityConfigurers != null && !webSecurityConfigurers.isEmpty();
+		
+		if (!hasConfigurers) {
+			WebSecurityConfigurerAdapter adapter = objectObjectPostProcessor.postProcess(new WebSecurityConfigurerAdapter() {});
+			webSecurity.apply(adapter);
+		}		
+		return webSecurity.build();
+	}
+
 	
 	@Autowired(required = false)
 	public void setFilterChainProxySecurityConfigurer() {
