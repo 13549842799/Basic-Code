@@ -8,8 +8,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.support.SpringFactoriesLoader;
-import org.springframework.security.authentication.AuthenticationTrustResolver;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
@@ -120,6 +118,31 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 	 */
 	public void configure(WebSecurity web) throws Exception {
 	}
+	
+	/**
+	 * Override this method to configure the {@link HttpSecurity}. Typically subclasses
+	 * should not invoke this method by calling super as it may override their
+	 * configuration. The default configuration is:
+	 *
+	 * <pre>
+	 * http.authorizeRequests().anyRequest().authenticated().and().formLogin().and().httpBasic();
+	 * </pre>
+	 *
+	 * @param http the {@link HttpSecurity} to modify
+	 * @throws Exception if an error occurs
+	 */
+	// @formatter:off
+	protected void configure(HttpSecurity http) throws Exception {
+		logger.debug("Using default configure(HttpSecurity). If subclassed this will potentially override subclass configure(HttpSecurity).");
+
+		http
+			.authorizeRequests()
+				.anyRequest().authenticated()
+				.and()
+			.formLogin().and()
+			.httpBasic();
+	}
+	
 	
 	public void init(final WebSecurity web) throws Exception {
 		final HttpSecurity http = getHttp();
