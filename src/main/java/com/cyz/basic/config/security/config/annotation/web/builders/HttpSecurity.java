@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
@@ -14,8 +15,10 @@ import com.cyz.basic.config.security.authentication.AuthenticationProvider;
 import com.cyz.basic.config.security.config.annotation.AbstractConfiguredSecurityBuilder;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.SecurityBuilder;
+import com.cyz.basic.config.security.config.annotation.SecurityConfigurerAdapter;
 import com.cyz.basic.config.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
+import com.cyz.basic.config.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import com.cyz.basic.config.security.core.userdetails.UserDetailsService;
 import com.cyz.basic.config.security.web.DefaultSecurityFilterChain;
 import com.cyz.basic.config.security.web.util.matcher.AnyRequestMatcher;
@@ -52,6 +55,10 @@ public final class HttpSecurity extends
 		ApplicationContext context = (ApplicationContext) sharedObjects
 				.get(ApplicationContext.class);
 		//this.requestMatcherConfigurer = new RequestMatcherConfigurer(context);
+	}
+	
+	private ApplicationContext getContext() {
+		return getSharedObject(ApplicationContext.class);
 	}
 
 	@Override
@@ -99,6 +106,96 @@ public final class HttpSecurity extends
 	protected DefaultSecurityFilterChain performBuild() throws Exception {
 		Collections.sort(filters, comparator);
 		return new DefaultSecurityFilterChain(requestMatcher, filters);
+	}
+	
+	/**
+	 * Allows restricting access based upon the {@link HttpServletRequest} using
+	 *
+	 * <h2>Example Configurations</h2>
+	 *
+	 * The most basic example is to configure all URLs to require the role "ROLE_USER".
+	 * The configuration below requires authentication to every URL and will grant access
+	 * to both the user "admin" and "user".
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class AuthorizeUrlsSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(HttpSecurity http) throws Exception {
+	 * 		http.authorizeRequests().antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;).and().formLogin();
+	 * 	}
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	 * 		auth.inMemoryAuthentication().withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;)
+	 * 				.and().withUser(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;ADMIN&quot;, &quot;USER&quot;);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * We can also configure multiple URLs. The configuration below requires
+	 * authentication to every URL and will grant access to URLs starting with /admin/ to
+	 * only the "admin" user. All other URLs either user can access.
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class AuthorizeUrlsSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(HttpSecurity http) throws Exception {
+	 * 		http.authorizeRequests().antMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;)
+	 * 				.antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;).and().formLogin();
+	 * 	}
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	 * 		auth.inMemoryAuthentication().withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;)
+	 * 				.and().withUser(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;ADMIN&quot;, &quot;USER&quot;);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * Note that the matchers are considered in order. Therefore, the following is invalid
+	 * because the first matcher matches every request and will never get to the second
+	 * mapping:
+	 *
+	 * <pre>
+	 * http.authorizeRequests().antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;).antMatchers(&quot;/admin/**&quot;)
+	 * 		.hasRole(&quot;ADMIN&quot;)
+	 * </pre>
+	 *
+	 * @see #requestMatcher(RequestMatcher)
+	 *
+	 * @return
+	 * @throws Exception
+	 */
+	public ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry authorizeRequests()
+			throws Exception {
+		ApplicationContext context = getContext();
+		return getOrApply(new ExpressionUrlAuthorizationConfigurer<>(context))
+				.getRegistry();
+	}
+	
+	/**
+	 * If the {@link SecurityConfigurer} has already been specified get the original,
+	 * otherwise apply the new {@link SecurityConfigurerAdapter}.
+	 *
+	 * @param configurer the {@link SecurityConfigurer} to apply if one is not found for
+	 * this {@link SecurityConfigurer} class.
+	 * @return the current {@link SecurityConfigurer} for the configurer passed in
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	private <C extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>> C getOrApply(
+			C configurer) throws Exception {
+		C existingConfig = (C) getConfigurer(configurer.getClass());
+		if (existingConfig != null) {
+			return existingConfig;
+		}
+		return apply(configurer);
 	}
 
 }
