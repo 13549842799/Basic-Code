@@ -135,12 +135,9 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 	protected void configure(HttpSecurity http) throws Exception {
 		logger.debug("Using default configure(HttpSecurity). If subclassed this will potentially override subclass configure(HttpSecurity).");
 
-		http
-			.authorizeRequests()
-				.anyRequest().authenticated()
-				.and()
-			.formLogin().and()
-			.httpBasic();
+		http.authorizeRequests().anyRequest().authenticated()
+			.and().formLogin();/*.and()
+			.httpBasic();*/
 	}
 	
 	

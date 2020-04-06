@@ -19,6 +19,7 @@ import com.cyz.basic.config.security.config.annotation.SecurityConfigurerAdapter
 import com.cyz.basic.config.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
 import com.cyz.basic.config.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import com.cyz.basic.config.security.config.annotation.web.configurers.FormLoginConfigurer;
 import com.cyz.basic.config.security.core.userdetails.UserDetailsService;
 import com.cyz.basic.config.security.web.DefaultSecurityFilterChain;
 import com.cyz.basic.config.security.web.util.matcher.AnyRequestMatcher;
@@ -196,6 +197,70 @@ public final class HttpSecurity extends
 			return existingConfig;
 		}
 		return apply(configurer);
+	}
+	
+	/**
+	 * Specifies to support form based authentication. If
+	 * {@link FormLoginConfigurer#loginPage(String)} is not specified a default login page
+	 * will be generated.
+	 *
+	 * <h2>Example Configurations</h2>
+	 *
+	 * The most basic configuration defaults to automatically generating a login page at
+	 * the URL "/login", redirecting to "/login?error" for authentication failure. The
+	 * details of the login page can be found on
+	 * {@link FormLoginConfigurer#loginPage(String)}
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class FormLoginSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(HttpSecurity http) throws Exception {
+	 * 		http.authorizeRequests().antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;).and().formLogin();
+	 * 	}
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	 * 		auth.inMemoryAuthentication().withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * The configuration below demonstrates customizing the defaults.
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class FormLoginSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(HttpSecurity http) throws Exception {
+	 * 		http.authorizeRequests().antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;).and().formLogin()
+	 * 				.usernameParameter(&quot;username&quot;) // default is username
+	 * 				.passwordParameter(&quot;password&quot;) // default is password
+	 * 				.loginPage(&quot;/authentication/login&quot;) // default is /login with an HTTP get
+	 * 				.failureUrl(&quot;/authentication/login?failed&quot;) // default is /login?error
+	 * 				.loginProcessingUrl(&quot;/authentication/login/process&quot;); // default is /login
+	 * 																		// with an HTTP
+	 * 																		// post
+	 * 	}
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	 * 		auth.inMemoryAuthentication().withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * @see FormLoginConfigurer#loginPage(String)
+	 *
+	 * @return
+	 * @throws Exception
+	 */
+	public FormLoginConfigurer<HttpSecurity> formLogin() throws Exception {
+		return getOrApply(new FormLoginConfigurer<>());
 	}
 
 }

@@ -89,13 +89,13 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 		@Override
 		public MvcMatchersAuthorizedUrl mvcMatchers(String... patterns) {
 			return mvcMatchers(null, patterns);
-		}
+		}*/
 		
 		@Override
 		protected final AuthorizedUrl chainRequestMatchersInternal(
 				List<RequestMatcher> requestMatchers) {
 			return new AuthorizedUrl(requestMatchers);
-		}*/
+		}
 		
 		/**
 		 * Allows customization of the {@link SecurityExpressionHandler} to be used. The
