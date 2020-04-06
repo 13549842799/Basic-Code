@@ -1,5 +1,6 @@
 package com.cyz.basic.config.security.config.annotation.web.configuration;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -7,10 +8,16 @@ import javax.servlet.Filter;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportAware;
+import org.springframework.core.OrderComparator;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotationMetadata;
 
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
@@ -81,10 +88,82 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 		return webSecurity.build();
 	}
 
-	
+	/**
+	 * Sets the {@code <SecurityConfigurer<FilterChainProxy, WebSecurityBuilder>}
+	 * instances used to create the web configuration.
+	 *
+	 * @param objectPostProcessor the {@link ObjectPostProcessor} used to create a
+	 * {@link WebSecurity} instance
+	 * @param webSecurityConfigurers the
+	 * {@code <SecurityConfigurer<FilterChainProxy, WebSecurityBuilder>} instances used to
+	 * create the web configuration
+	 * @throws Exception
+	 */
 	@Autowired(required = false)
-	public void setFilterChainProxySecurityConfigurer() {
+	public void setFilterChainProxySecurityConfigurer(ObjectPostProcessor<Object> objectPostProcessor,
+			@Value("#{@autowiredWebSecurityConfigurersIgnoreParents.getWebSecurityConfigurers()}") List<SecurityConfigurer<Filter, WebSecurity>> webSecurityConfigurers) throws Exception {
+		webSecurity = objectPostProcessor
+				.postProcess(new WebSecurity(objectPostProcessor));
+		if (debugEnabled != null) {
+			webSecurity.debug(debugEnabled);
+		}
 		
+		Collections.sort(webSecurityConfigurers, AnnotationAwareOrderComparator.INSTANCE);
+		Integer previousOrder = null;
+		Object previousConfig = null;
+		for (SecurityConfigurer<Filter, WebSecurity> config : webSecurityConfigurers) {
+			Integer order = AnnotationAwareOrderComparator.lookupOrder(config);
+			if (previousOrder != null && previousOrder.equals(order)) {
+				throw new IllegalStateException(
+						"@Order on WebSecurityConfigurers must be unique. Order of "
+								+ order + " was already used on " + previousConfig + ", so it cannot be used on "
+								+ config + " too.");
+			}
+			previousOrder = order;
+			previousConfig = config;
+		}
+		for (SecurityConfigurer<Filter, WebSecurity> webSecurityConfigurer : webSecurityConfigurers) {
+			webSecurity.apply(webSecurityConfigurer);
+		}
+		this.webSecurityConfigurers = webSecurityConfigurers;
+	}
+	
+	@Bean
+	public static AutowiredWebSecurityConfigurersIgnoreParents autowiredWebSecurityConfigurersIgnoreParents(
+			ConfigurableListableBeanFactory beanFactory) {
+		return new AutowiredWebSecurityConfigurersIgnoreParents(beanFactory);
+	}
+	
+	/**
+	 * A custom verision of the Spring provided AnnotationAwareOrderComparator that uses
+	 * {@link AnnotationUtils#findAnnotation(Class, Class)} to look on super class
+	 * instances for the {@link Order} annotation.
+	 *
+	 * @author Rob Winch
+	 * @since 3.2
+	 */
+	private static class AnnotationAwareOrderComparator extends OrderComparator {
+		private static final AnnotationAwareOrderComparator INSTANCE = new AnnotationAwareOrderComparator();
+
+		@Override
+		protected int getOrder(Object obj) {
+			return lookupOrder(obj);
+		}
+
+		private static int lookupOrder(Object obj) {
+			
+			if (obj instanceof Ordered) {
+				return ((Ordered) obj).getOrder();
+			}
+			if (obj != null) {
+				Class<?> clazz = (obj instanceof Class ? (Class<?>) obj : obj.getClass());
+				Order order = AnnotationUtils.findAnnotation(clazz, Order.class);
+				if (order != null) {
+					return order.value();
+				}
+			}
+			return Ordered.LOWEST_PRECEDENCE;
+		}
 	}
 	
 	/*

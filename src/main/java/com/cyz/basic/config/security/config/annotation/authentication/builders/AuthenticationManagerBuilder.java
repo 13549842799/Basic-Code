@@ -115,6 +115,14 @@ public class AuthenticationManagerBuilder extends
 	}
 	
 	
+	public <T extends UserDetailsService> DaoAuthenticationConfigurer<AuthenticationManagerBuilder, T> userDetailsService(
+			T userDetailsService) throws Exception {
+		this.defaultUserDetailsService = userDetailsService;
+		/*return apply(new DaoAuthenticationConfigurer<>(
+				userDetailsService));*/
+		return null;
+	}
+	
 	/**
 	 * Captures the {@link UserDetailsService} from any {@link UserDetailsAwareConfigurer}
 	 * .

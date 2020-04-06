@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
+import com.cyz.basic.config.security.access.intercept.FilterSecurityInterceptor;
 import com.cyz.basic.config.security.config.annotation.AbstractConfiguredSecurityBuilder;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.SecurityBuilder;
@@ -51,6 +52,8 @@ public final class WebSecurity extends
 	private final List<RequestMatcher> ignoredRequests = new ArrayList<>();
 	
 	private final List<SecurityBuilder<? extends SecurityFilterChain>> securityFilterChainBuilders = new ArrayList<SecurityBuilder<? extends SecurityFilterChain>>();
+	
+	private FilterSecurityInterceptor filterSecurityInterceptor;
 	
 	private boolean debugEnabled;
 	
@@ -143,6 +146,37 @@ public final class WebSecurity extends
 		postBuildAction.run();
 		
 		return result;
+	}
+	
+	/**
+	 * <p>
+	 * Adds builders to create {@link SecurityFilterChain} instances.
+	 * </p>
+	 *
+	 * <p>
+	 * Typically this method is invoked automatically within the framework from
+	 * {@link WebSecurityConfigurerAdapter#init(WebSecurity)}
+	 * </p>
+	 *
+	 * @param securityFilterChainBuilder the builder to use to create the
+	 * {@link SecurityFilterChain} instances
+	 * @return the {@link WebSecurity} for further customizations
+	 */
+	public WebSecurity addSecurityFilterChainBuilder(
+			SecurityBuilder<? extends SecurityFilterChain> securityFilterChainBuilder) {
+		this.securityFilterChainBuilders.add(securityFilterChainBuilder);
+		return this;
+	}
+	
+	/**
+	 * Sets the {@link FilterSecurityInterceptor}. This is typically invoked by
+	 * {@link WebSecurityConfigurerAdapter}.
+	 * @param securityInterceptor the {@link FilterSecurityInterceptor} to use
+	 * @return the {@link WebSecurity} for further customizations
+	 */
+	public WebSecurity securityInterceptor(FilterSecurityInterceptor securityInterceptor) {
+		this.filterSecurityInterceptor = securityInterceptor;
+		return this;
 	}
 
 }

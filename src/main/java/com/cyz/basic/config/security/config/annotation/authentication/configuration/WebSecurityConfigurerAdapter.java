@@ -1,10 +1,15 @@
 package com.cyz.basic.config.security.config.annotation.authentication.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.support.SpringFactoriesLoader;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
@@ -102,8 +107,9 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 		/*DefaultAuthenticationEventPublisher eventPublisher = objectPostProcessor
 				.postProcess(new DefaultAuthenticationEventPublisher());
 		localConfigureAuthenticationBldr.authenticationEventPublisher(eventPublisher);*/
+		Map<Class<? extends Object>, Object> sharedObjects = createSharedObjects();
 		
-		http = new HttpSecurity();
+		http = new HttpSecurity(objectPostProcessor, authenticationBuilder, sharedObjects);
 		
 		return http;
 	}
@@ -117,13 +123,28 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 	
 	public void init(final WebSecurity web) throws Exception {
 		final HttpSecurity http = getHttp();
-		/*web.addSecurityFilterChainBuilder(http).postBuildAction(new Runnable() {
+		web.addSecurityFilterChainBuilder(http).postBuildAction(new Runnable() {
 			public void run() {
 				FilterSecurityInterceptor securityInterceptor = http
 						.getSharedObject(FilterSecurityInterceptor.class);
 				web.securityInterceptor(securityInterceptor);
 			}
-		});*/
+		});
+	}
+	
+	/**
+	 * Creates the shared objects
+	 *
+	 * @return the shared Objects
+	 */
+	private Map<Class<? extends Object>, Object> createSharedObjects() {
+		Map<Class<? extends Object>, Object> sharedObjects = new HashMap<Class<? extends Object>, Object>();
+		sharedObjects.putAll(localConfigureAuthenticationBldr.getSharedObjects());
+		//sharedObjects.put(UserDetailsService.class, userDetailsService());
+		sharedObjects.put(ApplicationContext.class, context);
+		sharedObjects.put(ContentNegotiationStrategy.class, contentNegotiationStrategy);
+		//sharedObjects.put(AuthenticationTrustResolver.class, trustResolver);
+		return sharedObjects;
 	}
 
 }
