@@ -1,4 +1,4 @@
-package com.cyz.basic.config.security.service;
+package com.cyz.basic.config.security.provisioning;
 
 import java.util.List;
 

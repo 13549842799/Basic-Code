@@ -7,6 +7,16 @@ import java.util.Map;
 
 import javax.servlet.Filter;
 
+import org.springframework.web.filter.CorsFilter;
+
+import com.cyz.basic.config.security.access.intercept.FilterSecurityInterceptor;
+import com.cyz.basic.config.security.web.access.ExceptionTranslationFilter;
+import com.cyz.basic.config.security.web.authentication.AnonymousAuthenticationFilter;
+import com.cyz.basic.config.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.cyz.basic.config.security.web.authentication.logout.LogoutFilter;
+import com.cyz.basic.config.security.web.header.HeaderWriterFilter;
+import com.cyz.basic.config.security.web.www.BasicAuthenticationFilter;
+
 
 public final class FilterComparator implements Comparator<Filter>, Serializable {
     
@@ -15,29 +25,29 @@ public final class FilterComparator implements Comparator<Filter>, Serializable 
 	
 	FilterComparator() {
 		int order = 100;
-		/*put(ChannelProcessingFilter.class, order);
+		//put(ChannelProcessingFilter.class, order);
 		order += STEP;
-		put(ConcurrentSessionFilter.class, order);
+		//put(ConcurrentSessionFilter.class, order);
 		order += STEP;
-		put(WebAsyncManagerIntegrationFilter.class, order);
+		//put(WebAsyncManagerIntegrationFilter.class, order);
 		order += STEP;
-		put(SecurityContextPersistenceFilter.class, order);
+		//put(SecurityContextPersistenceFilter.class, order);
 		order += STEP;
 		put(HeaderWriterFilter.class, order);
 		order += STEP;
 		put(CorsFilter.class, order);
 		order += STEP;
-		put(CsrfFilter.class, order);
+		//put(CsrfFilter.class, order);
 		order += STEP;
 		put(LogoutFilter.class, order);
 		order += STEP;
-		filterToOrder.put(
+		/*filterToOrder.put(
 			"org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter",
-			order);
+			order);*/
 		order += STEP;
-		put(X509AuthenticationFilter.class, order);
+		//put(X509AuthenticationFilter.class, order);
 		order += STEP;
-		put(AbstractPreAuthenticatedProcessingFilter.class, order);
+		//put(AbstractPreAuthenticatedProcessingFilter.class, order);
 		order += STEP;
 		filterToOrder.put("org.springframework.security.cas.web.CasAuthenticationFilter",
 				order);
@@ -48,36 +58,36 @@ public final class FilterComparator implements Comparator<Filter>, Serializable 
 		order += STEP;
 		put(UsernamePasswordAuthenticationFilter.class, order);
 		order += STEP;
-		put(ConcurrentSessionFilter.class, order);
+		//put(ConcurrentSessionFilter.class, order);
 		order += STEP;
 		filterToOrder.put(
 				"org.springframework.security.openid.OpenIDAuthenticationFilter", order);
 		order += STEP;
-		put(DefaultLoginPageGeneratingFilter.class, order);
+		//put(DefaultLoginPageGeneratingFilter.class, order);
 		order += STEP;
-		put(ConcurrentSessionFilter.class, order);
+		//dput(ConcurrentSessionFilter.class, order);
 		order += STEP;
-		put(DigestAuthenticationFilter.class, order);
+		//put(DigestAuthenticationFilter.class, order);
 		order += STEP;
 		put(BasicAuthenticationFilter.class, order);
 		order += STEP;
-		put(RequestCacheAwareFilter.class, order);
+		//put(RequestCacheAwareFilter.class, order);
 		order += STEP;
-		put(SecurityContextHolderAwareRequestFilter.class, order);
+		//put(SecurityContextHolderAwareRequestFilter.class, order);
 		order += STEP;
-		put(JaasApiIntegrationFilter.class, order);
+		//put(JaasApiIntegrationFilter.class, order);
 		order += STEP;
-		put(RememberMeAuthenticationFilter.class, order);
+		//put(RememberMeAuthenticationFilter.class, order);
 		order += STEP;
 		put(AnonymousAuthenticationFilter.class, order);
 		order += STEP;
-		put(SessionManagementFilter.class, order);
+		//put(SessionManagementFilter.class, order);
 		order += STEP;
 		put(ExceptionTranslationFilter.class, order);
 		order += STEP;
 		put(FilterSecurityInterceptor.class, order);
 		order += STEP;
-		put(SwitchUserFilter.class, order);*/
+		//put(SwitchUserFilter.class, order);
 	}
 	
 	public int compare(Filter lhs, Filter rhs) {

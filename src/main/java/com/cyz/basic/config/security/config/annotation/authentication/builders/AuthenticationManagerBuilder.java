@@ -67,6 +67,18 @@ public class AuthenticationManagerBuilder extends
 		return this;
 	}
 	
+	/**
+	 *
+	 *
+	 * @param eraseCredentials true if {@link AuthenticationManager} should clear the
+	 * credentials from the {@link Authentication} object after authenticating
+	 * @return the {@link AuthenticationManagerBuilder} for further customizations
+	 */
+	public AuthenticationManagerBuilder eraseCredentials(boolean eraseCredentials) {
+		this.eraseCredentials = eraseCredentials;
+		return this;
+	}
+	
 	/*public JdbcUserDetailsManagerConfigurer<AuthenticationManagerBuilder> MysqlAuthentication()
 			throws Exception {
 		return apply(new JdbcUserDetailsManagerConfigurer<>());

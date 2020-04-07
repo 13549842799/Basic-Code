@@ -12,8 +12,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.cyz.basic.config.security.core.Authentication;
+import com.cyz.basic.config.security.web.JsonResponseStrategy;
+import com.cyz.basic.config.security.web.ResponseStrategy;
 import com.cyz.basic.config.security.web.UrlUtils;
 
+/**
+ * 参照类：AbstractAuthenticationTargetUrlRequestHandler
+ * @author cyz
+ *
+ */
 public abstract class AbstractAuthenticationTargetUrlRequestHandler {
 
 	protected final Log logger = LogFactory.getLog(this.getClass());
@@ -21,6 +28,8 @@ public abstract class AbstractAuthenticationTargetUrlRequestHandler {
 	private String defaultTargetUrl = "/";
 	private boolean alwaysUseDefaultTargetUrl = false;
 	private boolean useReferer = false;
+	private ResponseStrategy responseStrategy = new JsonResponseStrategy();
+	
 	
 	protected AbstractAuthenticationTargetUrlRequestHandler() {
 	}
@@ -41,6 +50,7 @@ public abstract class AbstractAuthenticationTargetUrlRequestHandler {
 			return;
 		}
 
+		responseStrategy.sendResponse(request, response, authentication);
 		//redirectStrategy.sendRedirect(request, response, targetUrl);
 		//因为前后端分离，所以返回
 	}

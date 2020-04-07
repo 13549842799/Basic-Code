@@ -16,9 +16,9 @@ import com.cyz.basic.config.security.access.SecurityMetadataSource;
 import com.cyz.basic.config.security.web.FilterInvocation;
 
 
-public class FilterSecurityInterceptor extends CyzAbstractSecurityInterceptor implements Filter {
+public class FilterSecurityInterceptor extends AbstractSecurityInterceptor implements Filter {
 	
-	private static final String FILTER_APPLIED = "__spring_security_CyzfilterSecurityInterceptor_filterApplied";
+	private static final String FILTER_APPLIED = "__spring_security_filterSecurityInterceptor_filterApplied";
 	
 	private FilterInvocationSecurityMetadataSource securityMetadataSource;
 	/**
@@ -27,17 +27,13 @@ public class FilterSecurityInterceptor extends CyzAbstractSecurityInterceptor im
 	private boolean observeOncePerRequest = true;
 
 	protected MessageSourceAccessor messages = null;
-	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		// TODO Auto-generated method stub
-
+	}
+	
+	@Override
+	public void destroy() {
 	}
 
 	@Override
@@ -45,39 +41,6 @@ public class FilterSecurityInterceptor extends CyzAbstractSecurityInterceptor im
 			throws IOException, ServletException {
 		FilterInvocation fi = new FilterInvocation(request, response, chain);
 		invoke(fi);
-	}
-	
-	public void invoke(FilterInvocation fi) throws IOException, ServletException {
-		if ((fi.getRequest() != null)
-				&& (fi.getRequest().getAttribute(FILTER_APPLIED) != null)
-				&& observeOncePerRequest) {
-			// filter already applied to this request and user wants us to observe
-			// once-per-request handling, so don't re-do security checking
-			fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
-		}
-		else {
-			// first time this request being called, so perform security checking
-			if (fi.getRequest() != null && observeOncePerRequest) {
-				fi.getRequest().setAttribute(FILTER_APPLIED, Boolean.TRUE);
-			}
-            
-			//InterceptorStatusToken token = super.beforeInvocation(fi);
-
-			try {
-				fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
-			}
-			finally {
-				//super.finallyInvocation(token);
-			}
-
-			//super.afterInvocation(token, null);
-		}
-	}
-
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -110,6 +73,34 @@ public class FilterSecurityInterceptor extends CyzAbstractSecurityInterceptor im
 	
 	public Class<?> getSecureObjectClass() {
 		return FilterInvocation.class;
+	}
+	
+	public void invoke(FilterInvocation fi) throws IOException, ServletException {
+		if ((fi.getRequest() != null)
+				&& (fi.getRequest().getAttribute(FILTER_APPLIED) != null)
+				&& observeOncePerRequest) {
+			// filter already applied to this request and user wants us to observe
+			// once-per-request handling, so don't re-do security checking
+			fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
+		}
+		else {
+			// first time this request being called, so perform security checking
+			if (fi.getRequest() != null && observeOncePerRequest) {
+				fi.getRequest().setAttribute(FILTER_APPLIED, Boolean.TRUE);
+			}
+            
+			//InterceptorStatusToken token = super.beforeInvocation(fi);
+			super.beforeInvocation(fi);
+
+			try {
+				fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
+			}
+			finally {
+				//super.finallyInvocation(token);
+			}
+
+			//super.afterInvocation(token, null);
+		}
 	}
 
 	public FilterInvocationSecurityMetadataSource getSecurityMetadataSource() {

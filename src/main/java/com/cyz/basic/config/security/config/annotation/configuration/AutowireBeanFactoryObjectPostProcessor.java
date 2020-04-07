@@ -80,7 +80,7 @@ public final class AutowireBeanFactoryObjectPostProcessor
 		if (result instanceof SmartInitializingSingleton) {
 			this.smartSingletons.add((SmartInitializingSingleton) result);
 		}
-		return null;
+		return result;
 	}
 	
 	

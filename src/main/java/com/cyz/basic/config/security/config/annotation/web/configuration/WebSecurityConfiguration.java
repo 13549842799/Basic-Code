@@ -19,6 +19,7 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.SecurityConfigurer;
@@ -26,6 +27,7 @@ import com.cyz.basic.config.security.config.annotation.authentication.configurat
 import com.cyz.basic.config.security.config.annotation.web.builders.WebSecurity;
 import com.cyz.basic.config.security.context.AbstractSecurityWebApplicationInitializer;
 import com.cyz.basic.config.security.context.DelegatingApplicationListener;
+import com.cyz.basic.config.security.core.context.CyzSecurityContextHolder;
 
 
 /**
@@ -77,10 +79,14 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 		return new DelegatingApplicationListener();
 	}
 	
+	@Autowired
+	public void setCyzSecurityContextHolder(RedisTemplate<String, Object> redisTemplate) {
+		CyzSecurityContextHolder.inintHolder(redisTemplate);
+	}
+	
 	@Bean(name = AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)
 	public Filter springSecurityFilterChain() throws Exception {
 		boolean hasConfigurers = webSecurityConfigurers != null && !webSecurityConfigurers.isEmpty();
-		
 		if (!hasConfigurers) {
 			WebSecurityConfigurerAdapter adapter = objectObjectPostProcessor.postProcess(new WebSecurityConfigurerAdapter() {});
 			webSecurity.apply(adapter);

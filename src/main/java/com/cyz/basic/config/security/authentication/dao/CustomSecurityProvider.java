@@ -17,7 +17,7 @@ import com.cyz.basic.config.security.exception.CredentialsExpiredException;
 import com.cyz.basic.config.security.exception.DisabledException;
 import com.cyz.basic.config.security.exception.LockedException;
 import com.cyz.basic.config.security.exception.UsernameNotFoundException;
-import com.cyz.basic.config.security.service.UserDetailServiceSupport;
+import com.cyz.basic.config.security.provisioning.UserDetailServiceSupport;
 
 public abstract class CustomSecurityProvider implements AuthenticationProvider, InitializingBean{
     

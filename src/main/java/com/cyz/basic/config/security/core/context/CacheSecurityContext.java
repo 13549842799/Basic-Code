@@ -68,7 +68,7 @@ public class CacheSecurityContext implements CyzSecurityContext {
 		String token = reqeust.getHeader("x-token");
 		
 		if (StringUtils.isEmpty(token)) {
-			throw new IllegalArgumentException("访问参数异常");
+			throw new IllegalArgumentException("访问参数异常:token不存在");
 		}
 		
 		return token;

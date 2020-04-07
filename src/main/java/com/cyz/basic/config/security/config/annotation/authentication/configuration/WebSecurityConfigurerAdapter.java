@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.support.SpringFactoriesLoader;
@@ -13,11 +15,16 @@ import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
 import com.cyz.basic.config.security.access.intercept.FilterSecurityInterceptor;
 import com.cyz.basic.config.security.authentication.AuthenticationManager;
+import com.cyz.basic.config.security.authentication.AuthenticationTrustResolver;
+import com.cyz.basic.config.security.authentication.AuthenticationTrustResolverImpl;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import com.cyz.basic.config.security.config.annotation.web.WebSecurityConfigurer;
 import com.cyz.basic.config.security.config.annotation.web.builders.HttpSecurity;
 import com.cyz.basic.config.security.config.annotation.web.builders.WebSecurity;
+import com.cyz.basic.config.security.crypto.factory.PasswordEncoderFactories;
+import com.cyz.basic.config.security.crypto.password.PasswordEncoder;
+
 
 
 /**
@@ -68,7 +75,7 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 	private boolean disableLocalConfigureAuthenticationBldr;
 	private boolean authenticationManagerInitialized;
 	private AuthenticationManager authenticationManager;
-	
+	private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 	private HttpSecurity http;
 	private boolean disableDefaults; //是否禁用默认的配置configuration
 	
@@ -140,6 +147,33 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 			.httpBasic();*/
 	}
 	
+	/**
+	 * Gets the ApplicationContext
+	 * @return the context
+	 */
+	protected final ApplicationContext getApplicationContext() {
+		return this.context;
+	}
+
+	@Autowired
+	public void setApplicationContext(ApplicationContext context) {
+		this.context = context;
+
+		@SuppressWarnings("unchecked")
+		ObjectPostProcessor<Object> objectPostProcessor = context.getBean(ObjectPostProcessor.class);
+		LazyPasswordEncoder passwordEncoder = new LazyPasswordEncoder(context);
+
+		authenticationBuilder = new DefaultPasswordEncoderAuthenticationManagerBuilder(objectPostProcessor, passwordEncoder);
+		localConfigureAuthenticationBldr = new DefaultPasswordEncoderAuthenticationManagerBuilder(objectPostProcessor, passwordEncoder) {
+			@Override
+			public AuthenticationManagerBuilder eraseCredentials(boolean eraseCredentials) {
+				authenticationBuilder.eraseCredentials(eraseCredentials);
+				return super.eraseCredentials(eraseCredentials);
+			}
+
+		};
+	}
+	
 	
 	public void init(final WebSecurity web) throws Exception {
 		final HttpSecurity http = getHttp();
@@ -159,12 +193,85 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 	 */
 	private Map<Class<? extends Object>, Object> createSharedObjects() {
 		Map<Class<? extends Object>, Object> sharedObjects = new HashMap<Class<? extends Object>, Object>();
+		System.out.println(localConfigureAuthenticationBldr == null);
 		sharedObjects.putAll(localConfigureAuthenticationBldr.getSharedObjects());
 		//sharedObjects.put(UserDetailsService.class, userDetailsService());
 		sharedObjects.put(ApplicationContext.class, context);
 		sharedObjects.put(ContentNegotiationStrategy.class, contentNegotiationStrategy);
-		//sharedObjects.put(AuthenticationTrustResolver.class, trustResolver);
+		sharedObjects.put(AuthenticationTrustResolver.class, trustResolver);
 		return sharedObjects;
+	}
+	
+	static class DefaultPasswordEncoderAuthenticationManagerBuilder extends AuthenticationManagerBuilder {
+		private PasswordEncoder defaultPasswordEncoder;
+
+		/**
+		 * Creates a new instance
+		 *
+		 * @param objectPostProcessor the {@link ObjectPostProcessor} instance to use.
+		 */
+		DefaultPasswordEncoderAuthenticationManagerBuilder(
+			ObjectPostProcessor<Object> objectPostProcessor, PasswordEncoder defaultPasswordEncoder) {
+			super(objectPostProcessor);
+			this.defaultPasswordEncoder = defaultPasswordEncoder;
+		}
+
+		/*@Override
+		public <T extends UserDetailsService> DaoAuthenticationConfigurer<AuthenticationManagerBuilder, T> userDetailsService(
+			T userDetailsService) throws Exception {
+			return super.userDetailsService(userDetailsService)
+				.passwordEncoder(this.defaultPasswordEncoder);
+		}*/
+	}
+	
+	static class LazyPasswordEncoder implements PasswordEncoder {
+		private ApplicationContext applicationContext;
+		private PasswordEncoder passwordEncoder;
+
+		LazyPasswordEncoder(ApplicationContext applicationContext) {
+			this.applicationContext = applicationContext;
+		}
+
+		@Override
+		public String encode(CharSequence rawPassword) {
+			return getPasswordEncoder().encode(rawPassword);
+		}
+
+		@Override
+		public boolean matches(CharSequence rawPassword,
+			String encodedPassword) {
+			return getPasswordEncoder().matches(rawPassword, encodedPassword);
+		}
+
+		@Override
+		public boolean upgradeEncoding(String encodedPassword) {
+			return getPasswordEncoder().upgradeEncoding(encodedPassword);
+		}
+
+		private PasswordEncoder getPasswordEncoder() {
+			if (this.passwordEncoder != null) {
+				return this.passwordEncoder;
+			}
+			PasswordEncoder passwordEncoder = getBeanOrNull(PasswordEncoder.class);
+			if (passwordEncoder == null) {
+				passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+			}
+			this.passwordEncoder = passwordEncoder;
+			return passwordEncoder;
+		}
+
+		private <T> T getBeanOrNull(Class<T> type) {
+			try {
+				return this.applicationContext.getBean(type);
+			} catch(NoSuchBeanDefinitionException notFound) {
+				return null;
+			}
+		}
+
+		@Override
+		public String toString() {
+			return getPasswordEncoder().toString();
+		}
 	}
 
 }

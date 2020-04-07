@@ -26,7 +26,7 @@ import com.cyz.basic.config.security.exception.AccessDeniedException;
 import com.cyz.basic.config.security.exception.AuthenticationCredentialsNotFoundException;
 
 
-public abstract class CyzAbstractSecurityInterceptor implements InitializingBean, ApplicationEventPublisherAware, MessageSourceAware{
+public abstract class AbstractSecurityInterceptor implements InitializingBean, ApplicationEventPublisherAware, MessageSourceAware{
 
 	protected final Log logger = LogFactory.getLog(getClass());
 	
