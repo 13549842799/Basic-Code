@@ -50,6 +50,13 @@ public class CacheSecurityContext implements CyzSecurityContext {
 		redisTemplate.opsForValue().set(key, authentication, properties.getExpireTime(), TimeUnit.SECONDS);
 	}
 	
+	public void clearAuthentication() {
+		String key = createAuthenticationKey();
+		if (redisTemplate.hasKey(key)) {
+			redisTemplate.delete(key);
+		}
+	}
+	
 	/**
 	 * 
 	 * @return

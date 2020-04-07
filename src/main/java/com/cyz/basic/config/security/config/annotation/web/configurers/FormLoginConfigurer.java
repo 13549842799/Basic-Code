@@ -2,6 +2,9 @@ package com.cyz.basic.config.security.config.annotation.web.configurers;
 
 
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
+import com.cyz.basic.config.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.cyz.basic.config.security.web.util.matcher.AntPathRequestMatcher;
+import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
 /**
  * Adds form based authentication. All attributes have reasonable defaults making all
@@ -42,6 +45,73 @@ import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
  * @author Shazin Sadakath
  * @since 3.2
  */
-public final class FormLoginConfigurer<H extends HttpSecurityBuilder<H>> extends AbstractHttpConfigurer<FormLoginConfigurer<H>, H> {
+public final class FormLoginConfigurer<H extends HttpSecurityBuilder<H>> extends 
+         AbstractAuthenticationFilterConfigurer<H, FormLoginConfigurer<H>, UsernamePasswordAuthenticationFilter>{
+	
+	/**
+	 * Creates a new instance
+	 * @see HttpSecurity#formLogin()
+	 */
+	public FormLoginConfigurer() {
+		super(new UsernamePasswordAuthenticationFilter(), null);
+		usernameParameter("username");
+		passwordParameter("password");
+	}
+	
+	/**
+	 * The HTTP parameter to look for the username when performing authentication. Default
+	 * is "username".
+	 *
+	 * @param usernameParameter the HTTP parameter to look for the username when
+	 * performing authentication
+	 * @return the {@link FormLoginConfigurer} for additional customization
+	 */
+	public FormLoginConfigurer<H> usernameParameter(String usernameParameter) {
+		getAuthenticationFilter().setUsernameParameter(usernameParameter);
+		return this;
+	}
+
+	/**
+	 * The HTTP parameter to look for the password when performing authentication. Default
+	 * is "password".
+	 *
+	 * @param passwordParameter the HTTP parameter to look for the password when
+	 * performing authentication
+	 * @return the {@link FormLoginConfigurer} for additional customization
+	 */
+	public FormLoginConfigurer<H> passwordParameter(String passwordParameter) {
+		getAuthenticationFilter().setPasswordParameter(passwordParameter);
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.security.config.annotation.web.configurers.
+	 * AbstractAuthenticationFilterConfigurer
+	 * #createLoginProcessingUrlMatcher(java.lang.String)
+	 */
+	@Override
+	protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
+		return new AntPathRequestMatcher(loginProcessingUrl, "POST");
+	}
+	
+	/**
+	 * Gets the HTTP parameter that is used to submit the username.
+	 *
+	 * @return the HTTP parameter that is used to submit the username
+	 */
+	private String getUsernameParameter() {
+		return getAuthenticationFilter().getUsernameParameter();
+	}
+
+	/**
+	 * Gets the HTTP parameter that is used to submit the password.
+	 *
+	 * @return the HTTP parameter that is used to submit the password
+	 */
+	private String getPasswordParameter() {
+		return getAuthenticationFilter().getPasswordParameter();
+	}
 
 }

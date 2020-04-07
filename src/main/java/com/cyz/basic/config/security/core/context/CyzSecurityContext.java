@@ -26,4 +26,6 @@ public interface CyzSecurityContext extends Serializable {
 	 * <code>null</code> if no further authentication information should be stored
 	 */
 	void setAuthentication(Authentication authentication);
+	
+	void clearAuthentication();
 }

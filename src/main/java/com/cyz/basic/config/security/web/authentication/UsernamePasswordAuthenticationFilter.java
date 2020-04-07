@@ -8,15 +8,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.util.Assert;
+
 import com.cyz.basic.config.security.authentication.UsernamePasswordAuthenticationToken;
 import com.cyz.basic.config.security.core.Authentication;
 import com.cyz.basic.config.security.exception.AuthenticationException;
 import com.cyz.basic.config.security.exception.AuthenticationServiceException;
 import com.cyz.basic.config.security.web.util.matcher.AntPathRequestMatcher;
 
-public class MyUsernamePasswordAuthenticationFilter extends  CyzAbstractAuthenticationProcessingFilter{
+public class UsernamePasswordAuthenticationFilter extends  AbstractAuthenticationProcessingFilter{
 	
-    public 	MyUsernamePasswordAuthenticationFilter () {
+    public 	UsernamePasswordAuthenticationFilter () {
     	super(new AntPathRequestMatcher("/login", "POST"));
     }
 	
@@ -101,5 +103,46 @@ public class MyUsernamePasswordAuthenticationFilter extends  CyzAbstractAuthenti
 		authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
 	}
 
+	/**
+	 * Sets the parameter name which will be used to obtain the username from the login
+	 * request.
+	 *
+	 * @param usernameParameter the parameter name. Defaults to "username".
+	 */
+	public void setUsernameParameter(String usernameParameter) {
+		Assert.hasText(usernameParameter, "Username parameter must not be empty or null");
+		this.usernameParameter = usernameParameter;
+	}
+
+	/**
+	 * Sets the parameter name which will be used to obtain the password from the login
+	 * request..
+	 *
+	 * @param passwordParameter the parameter name. Defaults to "password".
+	 */
+	public void setPasswordParameter(String passwordParameter) {
+		Assert.hasText(passwordParameter, "Password parameter must not be empty or null");
+		this.passwordParameter = passwordParameter;
+	}
 	
+	/**
+	 * Defines whether only HTTP POST requests will be allowed by this filter. If set to
+	 * true, and an authentication request is received which is not a POST request, an
+	 * exception will be raised immediately and authentication will not be attempted. The
+	 * <tt>unsuccessfulAuthentication()</tt> method will be called as if handling a failed
+	 * authentication.
+	 * <p>
+	 * Defaults to <tt>true</tt> but may be overridden by subclasses.
+	 */
+	public void setPostOnly(boolean postOnly) {
+		this.postOnly = postOnly;
+	}
+
+	public final String getUsernameParameter() {
+		return usernameParameter;
+	}
+
+	public final String getPasswordParameter() {
+		return passwordParameter;
+	}
 }

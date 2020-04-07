@@ -55,6 +55,16 @@ public abstract class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests().anyRequest().authenticated()
+		.and().formLogin().loginProcessingUrl(properties.getLoginUrl()).permitAll();//登录行为任意访问     
+		http.logout().clearAuthentication(true).logoutUrl(properties.getLogoutUrl()); //只允许已登录的访问
+		
+	}
+
+
+
 	protected abstract void additionalConfigure(HttpSecurity http);
 	
 	public abstract List<Filter> addFilters();

@@ -21,4 +21,5 @@ public class CyzSecurityContextHolder {
 			context = new CacheSecurityContext((RedisTemplate<String, Object>)redisTemplate);
 		}
 	}
-}
+
+} 

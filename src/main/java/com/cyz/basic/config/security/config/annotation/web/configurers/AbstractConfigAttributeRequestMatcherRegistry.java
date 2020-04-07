@@ -1,11 +1,16 @@
 package com.cyz.basic.config.security.config.annotation.web.configurers;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import com.cyz.basic.config.security.access.ConfigAttribute;
 import com.cyz.basic.config.security.config.annotation.web.AbstractRequestMatcherRegistry;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
 public abstract class AbstractConfigAttributeRequestMatcherRegistry<C> extends AbstractRequestMatcherRegistry<C> {
+	
+	private List<UrlMapping> urlMappings = new ArrayList<>();
 	
 	private List<RequestMatcher> unmappedMatchers;
 	
@@ -31,5 +36,50 @@ public abstract class AbstractConfigAttributeRequestMatcherRegistry<C> extends A
 	 * else to the {@link RequestMatcher}
 	 */
 	protected abstract C chainRequestMatchersInternal(List<RequestMatcher> requestMatchers);
+	
+	/**
+	 * A mapping of {@link RequestMatcher} to {@link Collection} of
+	 * {@link ConfigAttribute} instances
+	 */
+	static final class UrlMapping {
+		private RequestMatcher requestMatcher;
+		private Collection<ConfigAttribute> configAttrs;
+
+		UrlMapping(RequestMatcher requestMatcher, Collection<ConfigAttribute> configAttrs) {
+			this.requestMatcher = requestMatcher;
+			this.configAttrs = configAttrs;
+		}
+
+		public RequestMatcher getRequestMatcher() {
+			return requestMatcher;
+		}
+
+		public Collection<ConfigAttribute> getConfigAttrs() {
+			return configAttrs;
+		}
+	}
+	
+	/**
+	 * Adds a {@link UrlMapping} added by subclasses in
+	 * {@link #chainRequestMatchers(java.util.List)} at a particular index.
+	 *
+	 * @param index the index to add a {@link UrlMapping}
+	 * @param urlMapping {@link UrlMapping} the mapping to add
+	 */
+	final void addMapping(int index, UrlMapping urlMapping) {
+		this.urlMappings.add(index, urlMapping);
+	}
+	
+	/**
+	 * Adds a {@link UrlMapping} added by subclasses in
+	 * {@link #chainRequestMatchers(java.util.List)} and resets the unmapped
+	 * {@link RequestMatcher}'s.
+	 *
+	 * @param urlMapping {@link UrlMapping} the mapping to add
+	 */
+	final void addMapping(UrlMapping urlMapping) {
+		this.unmappedMatchers = null;
+		this.urlMappings.add(urlMapping);
+	}
 
 }

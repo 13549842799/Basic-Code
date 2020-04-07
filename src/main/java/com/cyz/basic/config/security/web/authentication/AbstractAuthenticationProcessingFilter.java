@@ -33,7 +33,7 @@ import com.cyz.basic.config.security.exception.InternalAuthenticationServiceExce
 import com.cyz.basic.config.security.web.util.matcher.AntPathRequestMatcher;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
-public abstract class CyzAbstractAuthenticationProcessingFilter implements ApplicationEventPublisherAware, MessageSourceAware, Filter{
+public abstract class AbstractAuthenticationProcessingFilter implements ApplicationEventPublisherAware, MessageSourceAware, Filter{
 
 	protected final Log logger = LogFactory.getLog(getClass());
 	
@@ -49,7 +49,7 @@ public abstract class CyzAbstractAuthenticationProcessingFilter implements Appli
 	private boolean continueChainBeforeSuccessfulAuthentication = false;
 	
 	
-	protected CyzAbstractAuthenticationProcessingFilter(String defaultFilterProcessesUrl) {
+	protected AbstractAuthenticationProcessingFilter(String defaultFilterProcessesUrl) {
 		setFilterProcessesUrl(defaultFilterProcessesUrl);
 	}
 	
@@ -59,7 +59,7 @@ public abstract class CyzAbstractAuthenticationProcessingFilter implements Appli
 	 * @param requiresAuthenticationRequestMatcher the {@link RequestMatcher} used to
 	 * determine if authentication is required. Cannot be null.
 	 */
-	protected CyzAbstractAuthenticationProcessingFilter(
+	protected AbstractAuthenticationProcessingFilter(
 			RequestMatcher requiresAuthenticationRequestMatcher) {
 		Assert.notNull(requiresAuthenticationRequestMatcher,
 				"requiresAuthenticationRequestMatcher cannot be null");
