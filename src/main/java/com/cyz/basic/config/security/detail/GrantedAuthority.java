@@ -2,8 +2,6 @@ package com.cyz.basic.config.security.detail;
 
 import java.io.Serializable;
 
-import org.springframework.security.access.AccessDecisionManager;
-
 public interface GrantedAuthority extends Serializable {
 
 	/**

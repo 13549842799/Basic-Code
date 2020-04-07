@@ -2,10 +2,11 @@ package com.cyz.basic.config.security.voter;
 
 import java.util.Collection;
 
-import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.vote.AuthenticatedVoter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
+import com.cyz.basic.config.security.access.ConfigAttribute;
+import com.cyz.basic.config.security.access.vote.AuthenticatedVoter;
+import com.cyz.basic.config.security.core.Authentication;
+import com.cyz.basic.config.security.detail.GrantedAuthority;
+
 
 public class MyAuthenticatedVoter extends AuthenticatedVoter {
 

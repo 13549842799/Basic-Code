@@ -1,7 +1,5 @@
 package com.cyz.basic.config.security.access.intercept;
 
-import org.springframework.security.web.FilterInvocation;
-
 import com.cyz.basic.config.security.access.SecurityMetadataSource;
 
 /**

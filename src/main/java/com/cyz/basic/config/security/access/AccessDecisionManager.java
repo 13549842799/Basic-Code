@@ -2,9 +2,8 @@ package com.cyz.basic.config.security.access;
 
 import java.util.Collection;
 
-import org.springframework.security.access.AccessDeniedException;
-
 import com.cyz.basic.config.security.core.Authentication;
+import com.cyz.basic.config.security.exception.AccessDeniedException;
 import com.cyz.basic.config.security.exception.InsufficientAuthenticationException;
 
 public interface AccessDecisionManager {

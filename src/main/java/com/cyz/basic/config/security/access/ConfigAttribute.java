@@ -2,9 +2,6 @@ package com.cyz.basic.config.security.access;
 
 import java.io.Serializable;
 
-import org.springframework.security.access.AccessDecisionManager;
-import org.springframework.security.access.intercept.RunAsManager;
-
 /**
  * Stores a security system related configuration attribute.
  *

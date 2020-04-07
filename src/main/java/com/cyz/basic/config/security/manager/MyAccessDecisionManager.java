@@ -3,12 +3,12 @@ package com.cyz.basic.config.security.manager;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.vote.AbstractAccessDecisionManager;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.core.Authentication;
+import com.cyz.basic.config.security.access.AccessDecisionVoter;
+import com.cyz.basic.config.security.access.ConfigAttribute;
+import com.cyz.basic.config.security.access.vote.AbstractAccessDecisionManager;
+import com.cyz.basic.config.security.core.Authentication;
+import com.cyz.basic.config.security.exception.AccessDeniedException;
+import com.cyz.basic.config.security.exception.InsufficientAuthenticationException;
 
 public class MyAccessDecisionManager extends AbstractAccessDecisionManager {
 

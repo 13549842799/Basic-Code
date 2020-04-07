@@ -6,8 +6,8 @@ import javax.servlet.Filter;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
+import com.cyz.basic.config.security.config.annotation.web.builders.HttpSecurity;
 import com.cyz.basic.config.security.core.context.CyzSecurityContextHolder;
 
 @EnableConfigurationProperties(value={SecurityProperties.class})

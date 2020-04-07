@@ -1,6 +1,6 @@
 package com.cyz.basic.config.security.core.userdetails;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.cyz.basic.config.security.exception.UsernameNotFoundException;
 
 public interface UserDetailsService {
 

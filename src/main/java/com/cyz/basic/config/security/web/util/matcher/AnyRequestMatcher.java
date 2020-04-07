@@ -11,10 +11,9 @@ public final class AnyRequestMatcher implements RequestMatcher {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public boolean equals(Object obj) {
 		return obj instanceof AnyRequestMatcher
-				|| obj instanceof org.springframework.security.web.util.matcher.AnyRequestMatcher;
+				|| obj instanceof AnyRequestMatcher;
 	}
 
 	@Override

@@ -4,8 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.CredentialsExpiredException;
 
 import com.cyz.basic.config.security.authentication.AuthenticationProvider;
 import com.cyz.basic.config.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,7 +11,9 @@ import com.cyz.basic.config.security.core.Authentication;
 import com.cyz.basic.config.security.core.userdetails.UserDetails;
 import com.cyz.basic.config.security.crypto.password.PasswordEncoder;
 import com.cyz.basic.config.security.detail.UserDetailsChecker;
+import com.cyz.basic.config.security.exception.AccountExpiredException;
 import com.cyz.basic.config.security.exception.AuthenticationException;
+import com.cyz.basic.config.security.exception.CredentialsExpiredException;
 import com.cyz.basic.config.security.exception.DisabledException;
 import com.cyz.basic.config.security.exception.LockedException;
 import com.cyz.basic.config.security.exception.UsernameNotFoundException;
