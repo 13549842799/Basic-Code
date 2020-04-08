@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.util.Assert;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cyz.basic.pojo.ResponseResult;
 
 /**
  * 网络请求工具
@@ -230,19 +231,26 @@ public abstract class HttpUtil {
 				resp.addHeader(hs[0], hs[1]);
 			}
     	}
-
-		resp.getWriter().write(params.getContent().toString());
+    	
+    	ResponseResult<Object> result = new ResponseResult<>();
+    	result.setStatus(params.getCode());
+    	result.setMessage(params.getErrorMessage());
+    	result.setData(params.getContent());
+    
+		resp.getWriter().write(JSONObject.toJSONString(result));
 		resp.getWriter().flush();
 
     }
     
     public static class RespParams {
     	
-    	private HttpServletRequest req;
-    	private HttpServletResponse resp;
+    	private final HttpServletRequest req;
+    	private final HttpServletResponse resp;
     	private String contentType = JSON_TYPE;
     	private Object content;
     	private String[] extraHeaders;
+    	private int code;
+    	private String errorMessage;
     	
     	public RespParams (HttpServletRequest req, HttpServletResponse resp) {
     		Assert.notNull(req, "request is null");
@@ -269,6 +277,23 @@ public abstract class HttpUtil {
     		this.extraHeaders = extraHeaders;
     		return this;
     	}
+    	
+    	public RespParams success(Object content) {
+    		this.code = ResponseResult.RESPONSE_SUCCESS;
+    		this.content = content;
+    		return this;
+    	}
+    	
+    	public RespParams error(String message) {
+    		this.code = ResponseResult.RESPONSE_ERROR;
+    		this.errorMessage = message;
+    		return this;
+    	}
+    	
+    	public RespParams errorMessage(String errorMessage) {
+    		this.errorMessage = errorMessage;
+    		return this;
+    	}
 
 		public HttpServletRequest getReq() {
 			return req;
@@ -284,6 +309,14 @@ public abstract class HttpUtil {
 
 		public Object getContent() {
 			return content;
+		}
+		
+		public int getCode() {
+			return code;
+		}
+		
+		public String getErrorMessage() {
+			return errorMessage;
 		}
 
 		public String[] getExtraHeaders() {

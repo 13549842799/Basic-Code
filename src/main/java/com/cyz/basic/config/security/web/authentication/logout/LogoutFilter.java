@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
 import com.cyz.basic.config.security.core.Authentication;
-import com.cyz.basic.config.security.core.context.CyzSecurityContextHolder;
+import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 import com.cyz.basic.config.security.web.UrlUtils;
 import com.cyz.basic.config.security.web.util.matcher.AntPathRequestMatcher;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
@@ -67,7 +67,7 @@ public class LogoutFilter extends GenericFilterBean {
 		
 		if (requiresLogout(request, response)) {
 			
-			Authentication auth = CyzSecurityContextHolder.getContext().getAuthentication();
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			
 			if (logger.isDebugEnabled()) {
 				logger.debug("Logging out user '" + auth

@@ -18,7 +18,7 @@ import com.cyz.basic.config.security.authentication.AuthenticationDetailsSource;
 import com.cyz.basic.config.security.authentication.WebAuthenticationDetailsSource;
 import com.cyz.basic.config.security.authority.AuthorityUtils;
 import com.cyz.basic.config.security.core.Authentication;
-import com.cyz.basic.config.security.core.context.CyzSecurityContextHolder;
+import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 import com.cyz.basic.config.security.detail.GrantedAuthority;
 
 public class AnonymousAuthenticationFilter extends GenericFilterBean implements InitializingBean {
@@ -65,19 +65,19 @@ public class AnonymousAuthenticationFilter extends GenericFilterBean implements 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
-		if (CyzSecurityContextHolder.getContext().getAuthentication() == null) {
-			CyzSecurityContextHolder.getContext().setAuthentication(
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			SecurityContextHolder.getContext().setAuthentication(
 					createAuthentication((HttpServletRequest) req));
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("Populated SecurityContextHolder with anonymous token: '"
-						+ CyzSecurityContextHolder.getContext().getAuthentication() + "'");
+						+ SecurityContextHolder.getContext().getAuthentication() + "'");
 			}
 		}
 		else {
 			if (logger.isDebugEnabled()) {
 				logger.debug("SecurityContextHolder not populated with anonymous token, as it already contained: '"
-						+ CyzSecurityContextHolder.getContext().getAuthentication() + "'");
+						+ SecurityContextHolder.getContext().getAuthentication() + "'");
 			}
 		}
 

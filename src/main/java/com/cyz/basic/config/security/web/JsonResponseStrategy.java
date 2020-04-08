@@ -14,9 +14,7 @@ public class JsonResponseStrategy implements ResponseStrategy {
 	@Override
 	public void sendResponse(HttpServletRequest request, HttpServletResponse response, Object data) throws IOException {
 		
-		String jsonStr = data != null ? JSON.toJSONString(data) : "";
-		
-		HttpUtil.responseResult(RespParams.create(request, response).content(jsonStr));
+		HttpUtil.responseResult(RespParams.create(request, response).success(data));
 	}
 
 }

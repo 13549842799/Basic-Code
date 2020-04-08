@@ -27,7 +27,7 @@ import com.cyz.basic.config.security.config.annotation.authentication.configurat
 import com.cyz.basic.config.security.config.annotation.web.builders.WebSecurity;
 import com.cyz.basic.config.security.context.AbstractSecurityWebApplicationInitializer;
 import com.cyz.basic.config.security.context.DelegatingApplicationListener;
-import com.cyz.basic.config.security.core.context.CyzSecurityContextHolder;
+import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 
 
 /**
@@ -81,7 +81,7 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 	
 	@Autowired
 	public void setCyzSecurityContextHolder(RedisTemplate<String, Object> redisTemplate) {
-		CyzSecurityContextHolder.inintHolder(redisTemplate);
+		SecurityContextHolder.inintHolder(redisTemplate);
 	}
 	
 	@Bean(name = AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)

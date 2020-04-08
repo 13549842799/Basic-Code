@@ -21,7 +21,7 @@ import com.cyz.basic.config.security.access.event.AuthorizedEvent;
 import com.cyz.basic.config.security.access.event.PublicInvocationEvent;
 import com.cyz.basic.config.security.authentication.AuthenticationManager;
 import com.cyz.basic.config.security.core.Authentication;
-import com.cyz.basic.config.security.core.context.CyzSecurityContextHolder;
+import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 import com.cyz.basic.config.security.exception.AccessDeniedException;
 import com.cyz.basic.config.security.exception.AuthenticationCredentialsNotFoundException;
 
@@ -85,7 +85,7 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean, A
 			logger.debug("Secure object: " + object + "; Attributes: " + attributes);
 		}
 		
-		if (CyzSecurityContextHolder.getContext().getAuthentication() == null) {
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
 			credentialsNotFound(messages.getMessage(
 					"AbstractSecurityInterceptor.authenticationNotFound",
 					"An Authentication object was not found in the SecurityContext"),
@@ -117,7 +117,7 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean, A
 	}
 	
 	private Authentication authenticateIfRequired() {
-		Authentication authentication = CyzSecurityContextHolder.getContext()
+		Authentication authentication = SecurityContextHolder.getContext()
 				.getAuthentication();
 
 		if (authentication.isAuthenticated() && !alwaysReauthenticate) {
@@ -136,7 +136,7 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean, A
 			logger.debug("Successfully Authenticated: " + authentication);
 		}
 
-		CyzSecurityContextHolder.getContext().setAuthentication(authentication);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		return authentication;
 	}

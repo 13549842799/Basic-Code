@@ -20,7 +20,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 import com.cyz.basic.config.SpringContextHolder;
 import com.cyz.basic.config.security.WebSecurityConfig;
-import com.cyz.basic.config.security.core.context.CyzSecurityContextHolder;
+import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 import com.cyz.basic.config.security.web.firewall.FirewalledRequest;
 import com.cyz.basic.config.security.web.firewall.HttpFirewall;
 import com.cyz.basic.config.security.web.firewall.StrictHttpFirewall;
@@ -164,7 +164,7 @@ public class FilterChainProxy implements Filter, InitializingBean{
 				doFilterInternal(request, response, chain);
 			}
 			finally {
-				CyzSecurityContextHolder.getContext().clearAuthentication();
+				SecurityContextHolder.getContext().clearAuthentication();
 				request.removeAttribute(FILTER_APPLIED);
 			}
 		}

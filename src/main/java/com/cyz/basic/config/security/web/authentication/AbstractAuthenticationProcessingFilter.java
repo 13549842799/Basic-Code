@@ -27,7 +27,7 @@ import com.cyz.basic.config.security.authentication.SimpleAuthenticationSuccessH
 import com.cyz.basic.config.security.authentication.WebAuthenticationDetailsSource;
 import com.cyz.basic.config.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import com.cyz.basic.config.security.core.Authentication;
-import com.cyz.basic.config.security.core.context.CyzSecurityContextHolder;
+import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 import com.cyz.basic.config.security.exception.AuthenticationException;
 import com.cyz.basic.config.security.exception.InternalAuthenticationServiceException;
 import com.cyz.basic.config.security.web.util.matcher.AntPathRequestMatcher;
@@ -158,7 +158,7 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 					+ authResult);
 		}
 
-		CyzSecurityContextHolder.getContext().setAuthentication(authResult);
+		SecurityContextHolder.getContext().setAuthentication(authResult);
 
 		// Fire event
 		if (this.eventPublisher != null) {

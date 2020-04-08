@@ -3,7 +3,7 @@ package com.cyz.basic.config.security.core.context;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
 
-public class CyzSecurityContextHolder {
+public class SecurityContextHolder {
 	
 	private static CyzSecurityContext context = null;
 	
@@ -13,7 +13,7 @@ public class CyzSecurityContextHolder {
 	
 	@SuppressWarnings("unchecked")
 	public static void inintHolder(Object redisTemplate) {
-		synchronized (CyzSecurityContextHolder.class) {
+		synchronized (SecurityContextHolder.class) {
 			Assert.isNull(context, "context had init");
 			if (!redisTemplate.getClass().isAssignableFrom(RedisTemplate.class)) {
 				throw new IllegalArgumentException("CyzSecurityContextHolder init error");

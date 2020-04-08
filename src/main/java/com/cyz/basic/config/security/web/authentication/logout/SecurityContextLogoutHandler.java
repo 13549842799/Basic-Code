@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
 
 import com.cyz.basic.config.security.core.Authentication;
 import com.cyz.basic.config.security.core.context.CyzSecurityContext;
-import com.cyz.basic.config.security.core.context.CyzSecurityContextHolder;
+import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 
 public class SecurityContextLogoutHandler implements LogoutHandler {
 	
@@ -29,7 +29,7 @@ public class SecurityContextLogoutHandler implements LogoutHandler {
 		}*/
 
 		if (clearAuthentication) {
-			CyzSecurityContext context = CyzSecurityContextHolder.getContext();
+			CyzSecurityContext context = SecurityContextHolder.getContext();
 			context.clearAuthentication();
 		}
 	}
