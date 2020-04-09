@@ -296,7 +296,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 			O result = performBuild();
 
 			buildState = BuildState.BUILT;
-
+            
 			return result;
 		}
 	}
@@ -328,7 +328,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	@SuppressWarnings("unchecked")
 	private void init() throws Exception {
 		Collection<SecurityConfigurer<O, B>> configurers = getConfigurers();
-
+        logger.info("size:" + configurers.size());
 		for (SecurityConfigurer<O, B> configurer : configurers) {
 			configurer.init((B) this);
 		}

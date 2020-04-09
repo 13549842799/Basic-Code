@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 
+import com.cyz.basic.config.security.authentication.AuthenticationManager;
 import com.cyz.basic.config.security.authentication.AuthenticationProvider;
 import com.cyz.basic.config.security.config.annotation.AbstractConfiguredSecurityBuilder;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
@@ -18,8 +19,11 @@ import com.cyz.basic.config.security.config.annotation.SecurityBuilder;
 import com.cyz.basic.config.security.config.annotation.SecurityConfigurerAdapter;
 import com.cyz.basic.config.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
+import com.cyz.basic.config.security.config.annotation.web.configurers.AnonymousConfigurer;
+import com.cyz.basic.config.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import com.cyz.basic.config.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import com.cyz.basic.config.security.config.annotation.web.configurers.FormLoginConfigurer;
+import com.cyz.basic.config.security.config.annotation.web.configurers.HeadersConfigurer;
 import com.cyz.basic.config.security.config.annotation.web.configurers.LogoutConfigurer;
 import com.cyz.basic.config.security.core.userdetails.UserDetailsService;
 import com.cyz.basic.config.security.web.DefaultSecurityFilterChain;
@@ -62,6 +66,115 @@ public final class HttpSecurity extends
 	private ApplicationContext getContext() {
 		return getSharedObject(ApplicationContext.class);
 	}
+	
+	/**
+	 * Adds the Security headers to the response. This is activated by default when using
+	 * {@link WebSecurityConfigurerAdapter}'s default constructor. Accepting the
+	 * default provided by {@link WebSecurityConfigurerAdapter} or only invoking
+	 * {@link #headers()} without invoking additional methods on it, is the equivalent of:
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class CsrfSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 *     protected void configure(HttpSecurity http) throws Exception {
+	 *         http
+	 *             .headers()
+	 *                 .contentTypeOptions()
+	 *                 .and()
+	 *                 .xssProtection()
+	 *                 .and()
+	 *                 .cacheControl()
+	 *                 .and()
+	 *                 .httpStrictTransportSecurity()
+	 *                 .and()
+	 *                 .frameOptions()
+	 *                 .and()
+	 *             ...;
+	 *     }
+	 * }
+	 * </pre>
+	 *
+	 * You can disable the headers using the following:
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class CsrfSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 *     protected void configure(HttpSecurity http) throws Exception {
+	 *         http
+	 *             .headers().disable()
+	 *             ...;
+	 *     }
+	 * }
+	 * </pre>
+	 *
+	 * You can enable only a few of the headers by first invoking
+	 * {@link HeadersConfigurer#defaultsDisabled()}
+	 * and then invoking the appropriate methods on the {@link #headers()} result.
+	 * For example, the following will enable {@link HeadersConfigurer#cacheControl()} and
+	 * {@link HeadersConfigurer#frameOptions()} only.
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class CsrfSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 *     protected void configure(HttpSecurity http) throws Exception {
+	 *         http
+	 *             .headers()
+	 *                  .defaultsDisabled()
+	 *                  .cacheControl()
+	 *                  .and()
+	 *                  .frameOptions()
+	 *                  .and()
+	 *             ...;
+	 *     }
+	 * }
+	 * </pre>
+	 *
+	 * You can also choose to keep the defaults but explicitly disable a subset of headers.
+	 * For example, the following will enable all the default headers except
+	 * {@link HeadersConfigurer#frameOptions()}.
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class CsrfSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 *     protected void configure(HttpSecurity http) throws Exception {
+	 *         http
+	 *             .headers()
+	 *                  .frameOptions()
+	 *                  	.disable()
+	 *                  .and()
+	 *             ...;
+	 *     }
+	 * }
+	 * </pre>
+	 *
+	 * @return
+	 * @throws Exception
+	 * @see HeadersConfigurer
+	 */
+	public HeadersConfigurer<HttpSecurity> headers() throws Exception {
+		return getOrApply(new HeadersConfigurer<>());
+	}
+	
+	public <C> void setSharedObject(Class<C> sharedType, C object) {
+		super.setSharedObject(sharedType, object);
+	}
+	
+	@Override
+	protected void beforeConfigure() throws Exception {
+		setSharedObject(AuthenticationManager.class, getAuthenticationRegistry().build());
+	}
 
 	@Override
 	public HttpSecurity authenticationProvider(AuthenticationProvider authenticationProvider) {
@@ -100,12 +213,14 @@ public final class HttpSecurity extends
 							+ filterClass.getName()
 							+ " does not have a registered order and cannot be added without a specified order. Consider using addFilterBefore or addFilterAfter instead.");
 		}
+		System.out.println("进入添加filter");
 		this.filters.add(filter);
 		return this;
 	}
 
 	@Override
 	protected DefaultSecurityFilterChain performBuild() throws Exception {
+		System.out.println("filter:" + filters.size());
 		Collections.sort(filters, comparator);
 		return new DefaultSecurityFilterChain(requestMatcher, filters);
 	}
@@ -263,6 +378,17 @@ public final class HttpSecurity extends
 	public FormLoginConfigurer<HttpSecurity> formLogin() throws Exception {
 		return getOrApply(new FormLoginConfigurer<>());
 	}
+	
+	/**
+	 * Allows configuring exception handling. This is automatically applied when using
+	 * {@link WebSecurityConfigurerAdapter}.
+	 *
+	 * @return the {@link ExceptionHandlingConfigurer} for further customizations
+	 * @throws Exception
+	 */
+	public ExceptionHandlingConfigurer<HttpSecurity> exceptionHandling() throws Exception {
+		return getOrApply(new ExceptionHandlingConfigurer<>());
+	}
 
 	/**
 	 * Provides logout support. This is automatically applied when using
@@ -303,5 +429,68 @@ public final class HttpSecurity extends
 	 */
 	public LogoutConfigurer<HttpSecurity> logout() throws Exception {
 		return getOrApply(new LogoutConfigurer<>());
+	}
+	
+	/**
+	 * Allows configuring how an anonymous user is represented. This is automatically
+	 * applied when used in conjunction with {@link WebSecurityConfigurerAdapter}. By
+	 * default anonymous users will be represented with an
+	 * {@link org.springframework.security.authentication.AnonymousAuthenticationToken}
+	 * and contain the role "ROLE_ANONYMOUS".
+	 *
+	 * <h2>Example Configuration</h2>
+	 *
+	 * The following configuration demonstrates how to specify that anonymous users should
+	 * contain the role "ROLE_ANON" instead.
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class AnononymousSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(HttpSecurity http) throws Exception {
+	 * 		http.authorizeRequests().antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;).and().formLogin()
+	 * 				.and()
+	 * 				// sample anonymous customization
+	 * 				.anonymous().authorities(&quot;ROLE_ANON&quot;);
+	 * 	}
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	 * 		auth.inMemoryAuthentication().withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * The following demonstrates how to represent anonymous users as null. Note that this
+	 * can cause {@link NullPointerException} in code that assumes anonymous
+	 * authentication is enabled.
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class AnononymousSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(HttpSecurity http) throws Exception {
+	 * 		http.authorizeRequests().antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;).and().formLogin()
+	 * 				.and()
+	 * 				// sample anonymous customization
+	 * 				.anonymous().disabled();
+	 * 	}
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	 * 		auth.inMemoryAuthentication().withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * @return
+	 * @throws Exception
+	 */
+	public AnonymousConfigurer<HttpSecurity> anonymous() throws Exception {
+		return getOrApply(new AnonymousConfigurer<>());
 	}
 }

@@ -10,6 +10,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.cyz.basic.config.security.exception.AccessDeniedException;
+import com.cyz.basic.config.security.web.JsonResponseStrategy;
+import com.cyz.basic.config.security.web.ResponseStrategy;
+import com.cyz.basic.util.HttpUtil;
+import com.cyz.basic.util.HttpUtil.RespParams;
 
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 	
@@ -19,7 +23,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 	public void handle(HttpServletRequest request, HttpServletResponse response,
 			AccessDeniedException accessDeniedException) throws IOException, ServletException {
 		if (!response.isCommitted()) {
-			
+			HttpUtil.responseResult(RespParams.create(request, response).fail("权限不足"));
 		}
 
 	}

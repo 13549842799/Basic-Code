@@ -116,16 +116,19 @@ public final class WebSecurity extends
 				"At least one SecurityBuilder<? extends SecurityFilterChain> needs to be specified. Typically this done by adding a @Configuration that extends WebSecurityConfigurerAdapter. More advanced users can invoke "
 						+ WebSecurity.class.getSimpleName()
 						+ ".addSecurityFilterChainBuilder directly");
-		
 		int chainSize = ignoredRequests.size() + securityFilterChainBuilders.size();
+		System.out.println("chainSize:" + chainSize);
 		List<SecurityFilterChain> securityFilterChains = new ArrayList<>(
 				chainSize);
 		for (RequestMatcher ignoredRequest : ignoredRequests) {
 			securityFilterChains.add(new DefaultSecurityFilterChain(ignoredRequest));
 		}
 		for (SecurityBuilder<? extends SecurityFilterChain> securityFilterChainBuilder : securityFilterChainBuilders) {
+			logger.info("create build:" + securityFilterChainBuilder.getClass().getName());
 			securityFilterChains.add(securityFilterChainBuilder.build());
 		}
+		System.out.println(securityFilterChains.get(0).getFilters().size());
+		System.out.println("chains:" + securityFilterChains.size());
 		FilterChainProxy filterChainProxy = new FilterChainProxy(securityFilterChains);
 		if (httpFirewall != null) {
 			filterChainProxy.setFirewall(httpFirewall);
@@ -164,6 +167,7 @@ public final class WebSecurity extends
 	 */
 	public WebSecurity addSecurityFilterChainBuilder(
 			SecurityBuilder<? extends SecurityFilterChain> securityFilterChainBuilder) {
+		System.out.println("addFilterBuilder");
 		this.securityFilterChainBuilders.add(securityFilterChainBuilder);
 		return this;
 	}

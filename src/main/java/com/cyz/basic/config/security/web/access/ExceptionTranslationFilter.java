@@ -22,6 +22,8 @@ import com.cyz.basic.config.security.exception.AuthenticationException;
 import com.cyz.basic.config.security.exception.InsufficientAuthenticationException;
 import com.cyz.basic.config.security.web.util.ThrowableAnalyzer;
 import com.cyz.basic.config.security.web.util.ThrowableCauseExtractor;
+import com.cyz.basic.util.HttpUtil;
+import com.cyz.basic.util.HttpUtil.RespParams;
 
 
 /**
@@ -149,15 +151,15 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 		}
 	}
 	
-	protected void sendStartAuthentication(HttpServletRequest request,
-			HttpServletResponse response, FilterChain chain,
+	protected void sendStartAuthentication(HttpServletRequest req,
+			HttpServletResponse resp, FilterChain chain,
 			AuthenticationException reason) throws ServletException, IOException {
 		// SEC-112: Clear the SecurityContextHolder's Authentication, as the
 		// existing Authentication is no longer considered valid
-		SecurityContextHolder.getContext().setAuthentication(null);
-		//requestCache.saveRequest(request, response);
+		SecurityContextHolder.getContext().clearAuthentication();
 		logger.debug("Calling Authentication entry point.");
 		//authenticationEntryPoint.commence(request, response, reason);
+		HttpUtil.responseResult(RespParams.create(req, resp).fail(reason.getMessage()));
 	}
 	
 	protected AuthenticationTrustResolver getAuthenticationTrustResolver() {

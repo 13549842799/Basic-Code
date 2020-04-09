@@ -290,10 +290,12 @@ public abstract class HttpUtil {
     		return this;
     	}
     	
-    	public RespParams errorMessage(String errorMessage) {
-    		this.errorMessage = errorMessage;
+    	public RespParams fail(String message) {
+    		this.code = ResponseResult.RESPONSE_FAIL;
+    		this.errorMessage = message;
     		return this;
     	}
+    	
 
 		public HttpServletRequest getReq() {
 			return req;

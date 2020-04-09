@@ -17,4 +17,16 @@ public class JsonResponseStrategy implements ResponseStrategy {
 		HttpUtil.responseResult(RespParams.create(request, response).success(data));
 	}
 
+	@Override
+	public void successResponse(HttpServletRequest request, HttpServletResponse response, Object data)
+			throws IOException {
+		HttpUtil.responseResult(RespParams.create(request, response).success(data));
+	}
+
+	@Override
+	public void failResponse(HttpServletRequest request, HttpServletResponse response, Object data) throws IOException {
+		HttpUtil.responseResult(RespParams.create(request, response).error(data != null ? data.toString() : ""));
+	}
+
+	
 }

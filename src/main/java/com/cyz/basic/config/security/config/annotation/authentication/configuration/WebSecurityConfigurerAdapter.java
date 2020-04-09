@@ -17,6 +17,7 @@ import com.cyz.basic.config.security.access.intercept.FilterSecurityInterceptor;
 import com.cyz.basic.config.security.authentication.AuthenticationManager;
 import com.cyz.basic.config.security.authentication.AuthenticationTrustResolver;
 import com.cyz.basic.config.security.authentication.AuthenticationTrustResolverImpl;
+import com.cyz.basic.config.security.authentication.DefaultAuthenticationEventPublisher;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import com.cyz.basic.config.security.config.annotation.web.WebSecurityConfigurer;
@@ -109,13 +110,25 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 			return http;
 		}
 		
-		/*DefaultAuthenticationEventPublisher eventPublisher = objectPostProcessor
+		DefaultAuthenticationEventPublisher eventPublisher = objectPostProcessor
 				.postProcess(new DefaultAuthenticationEventPublisher());
-		localConfigureAuthenticationBldr.authenticationEventPublisher(eventPublisher);*/
+		localConfigureAuthenticationBldr.authenticationEventPublisher(eventPublisher);
+		
+		AuthenticationManager authenticationManager = authenticationManager();
+		authenticationBuilder.parentAuthenticationManager(authenticationManager);
+		authenticationBuilder.authenticationEventPublisher(eventPublisher);		
 		Map<Class<? extends Object>, Object> sharedObjects = createSharedObjects();
 		
 		http = new HttpSecurity(objectPostProcessor, authenticationBuilder, sharedObjects);
-		
+		if (!disableDefaults) {
+			http
+			.exceptionHandling().and()
+			.headers().and()
+			.anonymous().and()
+			.logout();
+		}
+		System.out.println("getHttp");
+		configure(http);
 		return http;
 	}
 	
@@ -174,6 +187,29 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 		};
 	}
 	
+	@Autowired(required = false)
+	public void setTrustResolver(AuthenticationTrustResolver trustResolver) {
+		this.trustResolver = trustResolver;
+	}
+
+	@Autowired(required = false)
+	public void setContentNegotationStrategy(
+			ContentNegotiationStrategy contentNegotiationStrategy) {
+		this.contentNegotiationStrategy = contentNegotiationStrategy;
+	}
+	
+	@Autowired
+	public void setObjectPostProcessor(ObjectPostProcessor<Object> objectPostProcessor) {
+		this.objectPostProcessor = objectPostProcessor;
+	}
+
+	@Autowired
+	public void setAuthenticationConfiguration(
+			AuthenticationConfiguration authenticationConfiguration) {
+		this.authenticationConfiguration = authenticationConfiguration;
+		
+	}
+	
 	
 	public void init(final WebSecurity web) throws Exception {
 		final HttpSecurity http = getHttp();
@@ -184,6 +220,7 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 				web.securityInterceptor(securityInterceptor);
 			}
 		});
+		logger.info("结束");
 	}
 	
 	/**
@@ -193,7 +230,6 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 	 */
 	private Map<Class<? extends Object>, Object> createSharedObjects() {
 		Map<Class<? extends Object>, Object> sharedObjects = new HashMap<Class<? extends Object>, Object>();
-		System.out.println(localConfigureAuthenticationBldr == null);
 		sharedObjects.putAll(localConfigureAuthenticationBldr.getSharedObjects());
 		//sharedObjects.put(UserDetailsService.class, userDetailsService());
 		sharedObjects.put(ApplicationContext.class, context);
@@ -222,6 +258,77 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 			return super.userDetailsService(userDetailsService)
 				.passwordEncoder(this.defaultPasswordEncoder);
 		}*/
+	}
+	
+	/**
+	 * Gets the {@link AuthenticationManager} to use. The default strategy is if
+	 * {@link #configure(AuthenticationManagerBuilder)} method is overridden to use the
+	 * {@link AuthenticationManagerBuilder} that was passed in. Otherwise, autowire the
+	 * {@link AuthenticationManager} by type.
+	 *
+	 * @return the {@link AuthenticationManager} to use
+	 * @throws Exception
+	 */
+	protected AuthenticationManager authenticationManager() throws Exception {
+		if (!authenticationManagerInitialized) {
+			configure(localConfigureAuthenticationBldr);
+			if (disableLocalConfigureAuthenticationBldr) {
+				authenticationManager = authenticationConfiguration
+						.getAuthenticationManager();
+			}
+			else {
+				authenticationManager = localConfigureAuthenticationBldr.build();
+			}
+			authenticationManagerInitialized = true;
+		}
+		return authenticationManager;
+	}
+	
+	/**
+	 * Used by the default implementation of {@link #authenticationManager()} to attempt
+	 * to obtain an {@link AuthenticationManager}. If overridden, the
+	 * {@link AuthenticationManagerBuilder} should be used to specify the
+	 * {@link AuthenticationManager}.
+	 *
+	 * <p>
+	 * The {@link #authenticationManagerBean()} method can be used to expose the resulting
+	 * {@link AuthenticationManager} as a Bean. The {@link #userDetailsServiceBean()} can
+	 * be used to expose the last populated {@link UserDetailsService} that is created
+	 * with the {@link AuthenticationManagerBuilder} as a Bean. The
+	 * {@link UserDetailsService} will also automatically be populated on
+	 * {@link HttpSecurity#getSharedObject(Class)} for use with other
+	 * {@link SecurityContextConfigurer} (i.e. RememberMeConfigurer )
+	 * </p>
+	 *
+	 * <p>
+	 * For example, the following configuration could be used to register in memory
+	 * authentication that exposes an in memory {@link UserDetailsService}:
+	 * </p>
+	 *
+	 * <pre>
+	 * &#064;Override
+	 * protected void configure(AuthenticationManagerBuilder auth) {
+	 * 	auth
+	 * 	// enable in memory based authentication with a user named
+	 * 	// &quot;user&quot; and &quot;admin&quot;
+	 * 	.inMemoryAuthentication().withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).and()
+	 * 			.withUser(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;, &quot;ADMIN&quot;);
+	 * }
+	 *
+	 * // Expose the UserDetailsService as a Bean
+	 * &#064;Bean
+	 * &#064;Override
+	 * public UserDetailsService userDetailsServiceBean() throws Exception {
+	 * 	return super.userDetailsServiceBean();
+	 * }
+	 *
+	 * </pre>
+	 *
+	 * @param auth the {@link AuthenticationManagerBuilder} to use
+	 * @throws Exception
+	 */
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		this.disableLocalConfigureAuthenticationBldr = true;
 	}
 	
 	static class LazyPasswordEncoder implements PasswordEncoder {

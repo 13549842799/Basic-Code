@@ -66,10 +66,8 @@ public class CacheSecurityContext implements CyzSecurityContext {
 		HttpServletRequest reqeust = SpringMvcHolder.getRequest();
 		
 		String token = reqeust.getHeader("x-token");
-		
-		if (StringUtils.isEmpty(token)) {
-			throw new IllegalArgumentException("访问参数异常:token不存在");
-		}
+         
+	    token = token != null ? token : "";
 		
 		return token;
 	}

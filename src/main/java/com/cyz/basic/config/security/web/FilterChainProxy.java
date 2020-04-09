@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.web.filter.GenericFilterBean;
 
 import com.cyz.basic.config.SpringContextHolder;
 import com.cyz.basic.config.security.WebSecurityConfig;
@@ -123,7 +124,7 @@ import com.cyz.basic.config.security.web.firewall.StrictHttpFirewall;
 //@WebFilter(urlPatterns="/*")
 //@Component
 //@DependsOn("springContextHolder") //表示在springContextHolder（bean名）加载后再加载当前类
-public class FilterChainProxy implements Filter, InitializingBean{
+public class FilterChainProxy extends GenericFilterBean{
 	
 	private static final Log logger = LogFactory.getLog(FilterChainProxy.class);
 	
@@ -216,16 +217,6 @@ public class FilterChainProxy implements Filter, InitializingBean{
 
 		return null;
 	}
-
-	@Override
-	public void init(FilterConfig config) throws ServletException {}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		filterChainValidator.validate(this);
-	}
-	
-	
 	
 	public void setFirewall(HttpFirewall firewall) {
 		this.firewall = firewall;

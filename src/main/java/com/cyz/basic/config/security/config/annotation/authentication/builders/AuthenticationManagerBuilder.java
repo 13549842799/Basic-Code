@@ -10,6 +10,7 @@ import org.springframework.util.Assert;
 import com.cyz.basic.config.security.authentication.AuthenticationEventPublisher;
 import com.cyz.basic.config.security.authentication.AuthenticationManager;
 import com.cyz.basic.config.security.authentication.AuthenticationProvider;
+import com.cyz.basic.config.security.authentication.ProviderManager;
 import com.cyz.basic.config.security.config.annotation.AbstractConfiguredSecurityBuilder;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.authentication.ProviderManagerBuilder;
@@ -52,6 +53,27 @@ public class AuthenticationManagerBuilder extends
 	protected AuthenticationManager performBuild() throws Exception {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	/**
+	 * Allows providing a parent {@link AuthenticationManager} that will be tried if this
+	 * {@link AuthenticationManager} was unable to attempt to authenticate the provided
+	 * {@link Authentication}.
+	 *
+	 * @param authenticationManager the {@link AuthenticationManager} that should be used
+	 * if the current {@link AuthenticationManager} was unable to attempt to authenticate
+	 * the provided {@link Authentication}.
+	 * @return the {@link AuthenticationManagerBuilder} for further adding types of
+	 * authentication
+	 */
+	public AuthenticationManagerBuilder parentAuthenticationManager(
+			AuthenticationManager authenticationManager) {
+		if (authenticationManager instanceof ProviderManager) {
+			eraseCredentials(((ProviderManager) authenticationManager)
+					.isEraseCredentialsAfterAuthentication());
+		}
+		this.parentAuthenticationManager = authenticationManager;
+		return this;
 	}
 	
 	/**

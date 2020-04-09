@@ -20,5 +20,9 @@ public interface ResponseStrategy {
 	 * @throws IOException
 	 */
 	void sendResponse(HttpServletRequest request, HttpServletResponse response, Object data) throws IOException;
+	
+	void successResponse(HttpServletRequest request, HttpServletResponse response, Object data)  throws IOException;
+	
+	void failResponse(HttpServletRequest request, HttpServletResponse response, Object data)  throws IOException;
 
 }

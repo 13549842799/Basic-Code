@@ -90,7 +90,7 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 		if (!hasConfigurers) {
 			WebSecurityConfigurerAdapter adapter = objectObjectPostProcessor.postProcess(new WebSecurityConfigurerAdapter() {});
 			webSecurity.apply(adapter);
-		}		
+		}
 		return webSecurity.build();
 	}
 
