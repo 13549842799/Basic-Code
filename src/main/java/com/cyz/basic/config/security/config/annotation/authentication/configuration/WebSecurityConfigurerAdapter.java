@@ -13,7 +13,6 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
-import com.cyz.basic.config.security.access.intercept.FilterSecurityInterceptor;
 import com.cyz.basic.config.security.authentication.AuthenticationManager;
 import com.cyz.basic.config.security.authentication.AuthenticationTrustResolver;
 import com.cyz.basic.config.security.authentication.AuthenticationTrustResolverImpl;
@@ -25,6 +24,7 @@ import com.cyz.basic.config.security.config.annotation.web.builders.HttpSecurity
 import com.cyz.basic.config.security.config.annotation.web.builders.WebSecurity;
 import com.cyz.basic.config.security.crypto.factory.PasswordEncoderFactories;
 import com.cyz.basic.config.security.crypto.password.PasswordEncoder;
+import com.cyz.basic.config.security.web.access.intercept.FilterSecurityInterceptor;
 
 
 
@@ -127,7 +127,6 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 			.anonymous().and()
 			.logout();
 		}
-		System.out.println("getHttp");
 		configure(http);
 		return http;
 	}

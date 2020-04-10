@@ -1,13 +1,18 @@
 package com.cyz.basic.config.security.config.annotation.web.configurers;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpMethod;
 
-import com.cyz.basic.config.security.access.SecurityConfig;
+import com.cyz.basic.config.security.access.AccessDecisionVoter;
+import com.cyz.basic.config.security.access.ConfigAttribute;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
+import com.cyz.basic.config.security.web.access.expression.DefaultBaseMetadataSource;
 import com.cyz.basic.config.security.web.servlet.util.matcher.MvcRequestMatcher;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
@@ -20,7 +25,7 @@ import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
  * The following Filters are populated
  *
  * <ul>
- * <li>{@link org.springframework.security.web.access.intercept.FilterSecurityInterceptor}
+ * <li>{@link com.cyz.basic.config.security.web.access.intercept.security.web.access.intercept.FilterSecurityInterceptor}
  * </li>
  * </ul>
  *
@@ -30,7 +35,7 @@ import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
  * {@link org.springframework.security.config.annotation.SecurityConfigurer}'s to
  * customize:
  * <ul>
- * <li>{@link org.springframework.security.web.access.intercept.FilterSecurityInterceptor}
+ * <li>{@link com.cyz.basic.config.security.web.access.intercept.security.web.access.intercept.FilterSecurityInterceptor}
  * </li>
  * </ul>
  *
@@ -46,6 +51,9 @@ import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
  * @author Rob Winch
  * @since 3.2
  * @see org.springframework.security.config.annotation.web.builders.HttpSecurity#authorizeRequests()
+ * 
+ * 
+ * 权限管理配置 ，其中的一个功能是生成SpringSecurityFilter
  */
 public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBuilder<H>>
     extends AbstractInterceptUrlConfigurer<ExpressionUrlAuthorizationConfigurer<H>, H>{
@@ -129,6 +137,21 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 		}
 	
 	}
+	
+	
+	@Override
+	final DefaultBaseMetadataSource createMetadataSource(
+			H http) {
+		LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = REGISTRY
+				.createRequestMap();
+		if (requestMap.isEmpty()) {
+			throw new IllegalStateException(
+					"At least one mapping is required (i.e. authorizeRequests().anyRequest().authenticated())");
+		}
+		return new DefaultBaseMetadataSource(requestMap);
+	}
+	
+	
 	
 	/**
 	 * An {@link AuthorizedUrl} that allows optionally configuring the
@@ -328,6 +351,16 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 			interceptUrl(requestMatchers, SecurityConfig.createList(attribute));*/
 			return ExpressionUrlAuthorizationConfigurer.this.REGISTRY;
 		}
+	}
+
+
+	@Override
+	List<AccessDecisionVoter<? extends Object>> getDecisionVoters(H http) {
+		List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
+		/*WebExpressionVoter expressionVoter = new WebExpressionVoter();
+		expressionVoter.setExpressionHandler(getExpressionHandler(http));*/
+		//decisionVoters.add(expressionVoter);
+		return decisionVoters;
 	}
 
 }

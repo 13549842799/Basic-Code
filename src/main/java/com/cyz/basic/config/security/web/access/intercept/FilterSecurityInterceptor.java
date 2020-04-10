@@ -1,4 +1,4 @@
-package com.cyz.basic.config.security.access.intercept;
+package com.cyz.basic.config.security.web.access.intercept;
 
 import java.io.IOException;
 
@@ -13,6 +13,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceAccessor;
 
 import com.cyz.basic.config.security.access.SecurityMetadataSource;
+import com.cyz.basic.config.security.access.intercept.AbstractSecurityInterceptor;
 import com.cyz.basic.config.security.web.FilterInvocation;
 
 

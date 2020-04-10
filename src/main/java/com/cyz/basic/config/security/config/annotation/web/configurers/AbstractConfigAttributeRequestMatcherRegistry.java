@@ -2,6 +2,7 @@ package com.cyz.basic.config.security.config.annotation.web.configurers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.cyz.basic.config.security.access.ConfigAttribute;
@@ -13,6 +14,17 @@ public abstract class AbstractConfigAttributeRequestMatcherRegistry<C> extends A
 	private List<UrlMapping> urlMappings = new ArrayList<>();
 	
 	private List<RequestMatcher> unmappedMatchers;
+	
+	/**
+	 * Gets the {@link UrlMapping} added by subclasses in
+	 * {@link #chainRequestMatchers(java.util.List)}. May be empty.
+	 *
+	 * @return the {@link UrlMapping} added by subclasses in
+	 * {@link #chainRequestMatchers(java.util.List)}
+	 */
+	final List<UrlMapping> getUrlMappings() {
+		return urlMappings;
+	}
 	
 	/**
 	 * Marks the {@link RequestMatcher}'s as unmapped and then calls
@@ -80,6 +92,30 @@ public abstract class AbstractConfigAttributeRequestMatcherRegistry<C> extends A
 	final void addMapping(UrlMapping urlMapping) {
 		this.unmappedMatchers = null;
 		this.urlMappings.add(urlMapping);
+	}
+	
+	/**
+	 * Creates the mapping of {@link RequestMatcher} to {@link Collection} of
+	 * {@link ConfigAttribute} instances
+	 *
+	 * @return the mapping of {@link RequestMatcher} to {@link Collection} of
+	 * {@link ConfigAttribute} instances. Cannot be null.
+	 */
+	final LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> createRequestMap() {
+		if (unmappedMatchers != null) {
+			throw new IllegalStateException(
+					"An incomplete mapping was found for "
+							+ unmappedMatchers
+							+ ". Try completing it with something like requestUrls().<something>.hasRole('USER')");
+		}
+
+		LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = new LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>>();
+		for (UrlMapping mapping : getUrlMappings()) {
+			RequestMatcher matcher = mapping.getRequestMatcher();
+			Collection<ConfigAttribute> configAttrs = mapping.getConfigAttrs();
+			requestMap.put(matcher, configAttrs);
+		}
+		return requestMap;
 	}
 
 }

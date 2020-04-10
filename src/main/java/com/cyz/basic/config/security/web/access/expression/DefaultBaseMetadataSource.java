@@ -1,39 +1,29 @@
-package com.cyz.basic.config.security.service;
+package com.cyz.basic.config.security.web.access.expression;
 
 import java.util.Collection;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
-
 import com.cyz.basic.config.security.access.ConfigAttribute;
-import com.cyz.basic.config.security.web.FilterInvocation;
 import com.cyz.basic.config.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
-public abstract class SecurityMetadataSourceSupport implements FilterInvocationSecurityMetadataSource {
+public class DefaultBaseMetadataSource implements FilterInvocationSecurityMetadataSource {
 	
 	private Map<RequestMatcher, Collection<ConfigAttribute>> requestMap;
 	
-	public SecurityMetadataSourceSupport() {
+	public DefaultBaseMetadataSource() {
 		
 	}
 	
-	protected abstract Map<RequestMatcher, Collection<ConfigAttribute>> createMap();
+    public DefaultBaseMetadataSource(Map<RequestMatcher, Collection<ConfigAttribute>> requestMap) {
+		
+	}
 
 	@Override
 	public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
-		final HttpServletRequest request = ((FilterInvocation) object).getRequest();
-		for (Map.Entry<RequestMatcher, Collection<ConfigAttribute>> entry : createMap()
-				.entrySet()) {
-			System.out.println(entry.getKey());
-			if (entry.getKey().matches(request)) {
-				return entry.getValue();
-			}
-		}
+		// TODO Auto-generated method stub
 		return null;
 	}
-	
 
 	@Override
 	public Collection<ConfigAttribute> getAllConfigAttributes() {

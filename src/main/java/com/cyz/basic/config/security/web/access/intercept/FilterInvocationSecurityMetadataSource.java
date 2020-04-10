@@ -1,4 +1,4 @@
-package com.cyz.basic.config.security.access.intercept;
+package com.cyz.basic.config.security.web.access.intercept;
 
 import com.cyz.basic.config.security.access.SecurityMetadataSource;
 
