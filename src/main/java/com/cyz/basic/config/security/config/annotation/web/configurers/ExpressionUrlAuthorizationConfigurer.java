@@ -5,14 +5,17 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpMethod;
 
 import com.cyz.basic.config.security.access.AccessDecisionVoter;
 import com.cyz.basic.config.security.access.ConfigAttribute;
+import com.cyz.basic.config.security.access.SecurityConfig;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
-import com.cyz.basic.config.security.web.access.expression.DefaultBaseMetadataSource;
+import com.cyz.basic.config.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
 import com.cyz.basic.config.security.web.servlet.util.matcher.MvcRequestMatcher;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
@@ -57,6 +60,8 @@ import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
  */
 public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBuilder<H>>
     extends AbstractInterceptUrlConfigurer<ExpressionUrlAuthorizationConfigurer<H>, H>{
+	
+	private final Log logger = LogFactory.getLog(ExpressionUrlAuthorizationConfigurer.class);
 	
 	static final String permitAll = "permitAll";
 	private static final String denyAll = "denyAll";
@@ -138,17 +143,53 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 	
 	}
 	
+	/**
+	 * Allows registering multiple {@link RequestMatcher} instances to a collection of
+	 * {@link ConfigAttribute} instances
+	 *
+	 * @param requestMatchers the {@link RequestMatcher} instances to register to the
+	 * {@link ConfigAttribute} instances
+	 * @param configAttributes the {@link ConfigAttribute} to be mapped by the
+	 * {@link RequestMatcher} instances
+	 */
+	private void interceptUrl(Iterable<? extends RequestMatcher> requestMatchers,
+			Collection<ConfigAttribute> configAttributes) {
+		for (RequestMatcher requestMatcher : requestMatchers) {
+			REGISTRY.addMapping(new AbstractConfigAttributeRequestMatcherRegistry.UrlMapping(
+					requestMatcher, configAttributes));
+		}
+	}
+
+	@Override
+	List<AccessDecisionVoter<? extends Object>> getDecisionVoters(H http) {
+		List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
+		/*WebExpressionVoter expressionVoter = new WebExpressionVoter();
+		expressionVoter.setExpressionHandler(getExpressionHandler(http));*/
+		//decisionVoters.add(expressionVoter);
+		return decisionVoters;
+	}
+	
 	
 	@Override
-	final DefaultBaseMetadataSource createMetadataSource(
+	final DefaultFilterInvocationSecurityMetadataSource createMetadataSource(
 			H http) {
+		
+		ApplicationContext context = http.getSharedObject(ApplicationContext.class);
+		
+		DefaultFilterInvocationSecurityMetadataSource source = context.getBean(DefaultFilterInvocationSecurityMetadataSource.class);
+		
+		if (source != null) {
+			logger.info("use the MetadataSource as the bean");
+			return source;
+		}
+		
 		LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = REGISTRY
 				.createRequestMap();
 		if (requestMap.isEmpty()) {
 			throw new IllegalStateException(
 					"At least one mapping is required (i.e. authorizeRequests().anyRequest().authenticated())");
 		}
-		return new DefaultBaseMetadataSource(requestMap);
+		return new DefaultFilterInvocationSecurityMetadataSource(requestMap);
 	}
 	
 	
@@ -345,22 +386,13 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 		 * customization
 		 */
 		public ExpressionInterceptUrlRegistry access(String attribute) {
-			/*if (not) {
+			if (not) {
 				attribute = "!" + attribute;
 			}
-			interceptUrl(requestMatchers, SecurityConfig.createList(attribute));*/
+			interceptUrl(requestMatchers, SecurityConfig.createList(attribute));
 			return ExpressionUrlAuthorizationConfigurer.this.REGISTRY;
 		}
 	}
 
-
-	@Override
-	List<AccessDecisionVoter<? extends Object>> getDecisionVoters(H http) {
-		List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
-		/*WebExpressionVoter expressionVoter = new WebExpressionVoter();
-		expressionVoter.setExpressionHandler(getExpressionHandler(http));*/
-		//decisionVoters.add(expressionVoter);
-		return decisionVoters;
-	}
 
 }
