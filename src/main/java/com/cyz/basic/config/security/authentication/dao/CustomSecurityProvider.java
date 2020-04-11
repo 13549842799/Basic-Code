@@ -31,8 +31,6 @@ protected final Log logger = LogFactory.getLog(getClass());
 	private UserDetailsChecker postAuthenticationChecks = new DefaultPostAuthenticationChecks();
 	
 	protected UserDetailServiceSupport detailsService;
-	
-	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -86,15 +84,6 @@ protected final Log logger = LogFactory.getLog(getClass());
 	public boolean supports(Class<?> authentication) {
 		System.out.println(authentication.getName());
 		return true;
-	}
-
-
-	public PasswordEncoder getPasswordEncoder() {
-		return passwordEncoder;
-	}
-
-	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-		this.passwordEncoder = passwordEncoder;
 	}
 
 	public void setDetailsService(UserDetailServiceSupport detailsService) {

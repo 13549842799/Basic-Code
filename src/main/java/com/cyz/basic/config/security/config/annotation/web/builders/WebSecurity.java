@@ -117,7 +117,6 @@ public final class WebSecurity extends
 						+ WebSecurity.class.getSimpleName()
 						+ ".addSecurityFilterChainBuilder directly");
 		int chainSize = ignoredRequests.size() + securityFilterChainBuilders.size();
-		System.out.println("chainSize:" + chainSize);
 		List<SecurityFilterChain> securityFilterChains = new ArrayList<>(
 				chainSize);
 		for (RequestMatcher ignoredRequest : ignoredRequests) {
@@ -127,8 +126,6 @@ public final class WebSecurity extends
 			logger.info("create build:" + securityFilterChainBuilder.getClass().getName());
 			securityFilterChains.add(securityFilterChainBuilder.build());
 		}
-		System.out.println(securityFilterChains.get(0).getFilters().size());
-		System.out.println("chains:" + securityFilterChains.size());
 		FilterChainProxy filterChainProxy = new FilterChainProxy(securityFilterChains);
 		if (httpFirewall != null) {
 			filterChainProxy.setFirewall(httpFirewall);

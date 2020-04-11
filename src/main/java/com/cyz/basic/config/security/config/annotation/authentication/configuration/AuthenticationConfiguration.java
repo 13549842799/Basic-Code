@@ -43,7 +43,7 @@ import com.cyz.basic.config.security.exception.AuthenticationException;
 @Configuration
 @Import(ObjectPostProcessorConfiguration.class)
 public class AuthenticationConfiguration {
-	
+
 	/**
 	 * AtomicBoolean是java.util.concurrent.atomic的原子变量的类；这样的类具有原子性，在多线程的环境下使用是线程安全的；
 	 * 这个类和普通的boolean的区别在于后者线程不安全，举例来说，当有多个线程要用到某个boolean变量的值，然后修改它，但存在多个线程同时修改的情况，
@@ -78,6 +78,16 @@ public class AuthenticationConfiguration {
 	public static GlobalAuthenticationConfigurerAdapter enableGlobalAuthenticationAutowiredConfigurer(
 			ApplicationContext context) {
 		return new EnableGlobalAuthenticationAutowiredConfigurer(context);
+	}
+	
+	@Bean
+	public static InitializeUserDetailsBeanManagerConfigurer initializeUserDetailsBeanManagerConfigurer(ApplicationContext context) {
+		return new InitializeUserDetailsBeanManagerConfigurer(context);
+	}
+	
+	@Bean
+	public static InitializeAuthenticationProviderBeanManagerConfigurer initializeAuthenticationProviderBeanManagerConfigurer(ApplicationContext context) {
+		return new InitializeAuthenticationProviderBeanManagerConfigurer(context);
 	}
 	
 	public AuthenticationManager getAuthenticationManager() throws Exception {

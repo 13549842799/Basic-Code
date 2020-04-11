@@ -56,6 +56,25 @@ public class AuthenticationManagerBuilder extends
 	}
 	
 	/**
+	 * Determines if the {@link AuthenticationManagerBuilder} is configured to build a non
+	 * null {@link AuthenticationManager}. This means that either a non-null parent is
+	 * specified or at least one {@link AuthenticationProvider} has been specified.
+	 *
+	 * <p>
+	 * When using {@link SecurityConfigurer} instances, the
+	 * {@link AuthenticationManagerBuilder} will not be configured until the
+	 * {@link SecurityConfigurer#configure(SecurityBuilder)} methods. This means a
+	 * {@link SecurityConfigurer} that is last could check this method and provide a
+	 * default configuration in the {@link SecurityConfigurer#configure(SecurityBuilder)}
+	 * method.
+	 *
+	 * @return
+	 */
+	public boolean isConfigured() {
+		return !authenticationProviders.isEmpty() || parentAuthenticationManager != null;
+	}
+	
+	/**
 	 * Allows providing a parent {@link AuthenticationManager} that will be tried if this
 	 * {@link AuthenticationManager} was unable to attempt to authenticate the provided
 	 * {@link Authentication}.

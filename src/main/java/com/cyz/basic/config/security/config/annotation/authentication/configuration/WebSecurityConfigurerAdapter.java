@@ -1,6 +1,8 @@
 package com.cyz.basic.config.security.config.annotation.authentication.configuration;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -22,8 +24,11 @@ import com.cyz.basic.config.security.config.annotation.authentication.builders.A
 import com.cyz.basic.config.security.config.annotation.web.WebSecurityConfigurer;
 import com.cyz.basic.config.security.config.annotation.web.builders.HttpSecurity;
 import com.cyz.basic.config.security.config.annotation.web.builders.WebSecurity;
+import com.cyz.basic.config.security.core.userdetails.UserDetails;
+import com.cyz.basic.config.security.core.userdetails.UserDetailsService;
 import com.cyz.basic.config.security.crypto.factory.PasswordEncoderFactories;
 import com.cyz.basic.config.security.crypto.password.PasswordEncoder;
+import com.cyz.basic.config.security.exception.UsernameNotFoundException;
 import com.cyz.basic.config.security.web.access.intercept.FilterSecurityInterceptor;
 
 
@@ -210,6 +215,21 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 		
 	}
 	
+	/**
+	 * Allows modifying and accessing the {@link UserDetailsService} from
+	 * {@link #userDetailsServiceBean()} without interacting with the
+	 * {@link ApplicationContext}. Developers should override this method when changing
+	 * the instance of {@link #userDetailsServiceBean()}.
+	 *
+	 * @return
+	 */
+	protected UserDetailsService userDetailsService() {
+		AuthenticationManagerBuilder globalAuthBuilder = context
+				.getBean(AuthenticationManagerBuilder.class);
+		return new UserDetailsServiceDelegator(Arrays.asList(
+				localConfigureAuthenticationBldr, globalAuthBuilder));
+	}
+	
 	
 	public void init(final WebSecurity web) throws Exception {
 		final HttpSecurity http = getHttp();
@@ -230,11 +250,58 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 	private Map<Class<? extends Object>, Object> createSharedObjects() {
 		Map<Class<? extends Object>, Object> sharedObjects = new HashMap<Class<? extends Object>, Object>();
 		sharedObjects.putAll(localConfigureAuthenticationBldr.getSharedObjects());
-		//sharedObjects.put(UserDetailsService.class, userDetailsService());
+		sharedObjects.put(UserDetailsService.class, userDetailsService());
 		sharedObjects.put(ApplicationContext.class, context);
 		sharedObjects.put(ContentNegotiationStrategy.class, contentNegotiationStrategy);
 		sharedObjects.put(AuthenticationTrustResolver.class, trustResolver);
 		return sharedObjects;
+	}
+	
+	/**
+	 * Delays the use of the {@link UserDetailsService} from the
+	 * {@link AuthenticationManagerBuilder} to ensure that it has been fully configured.
+	 *
+	 * @author Rob Winch
+	 * @since 3.2
+	 */
+	static final class UserDetailsServiceDelegator implements UserDetailsService {
+		private List<AuthenticationManagerBuilder> delegateBuilders;
+		private UserDetailsService delegate;
+		private final Object delegateMonitor = new Object();
+
+		UserDetailsServiceDelegator(List<AuthenticationManagerBuilder> delegateBuilders) {
+			if (delegateBuilders.contains(null)) {
+				throw new IllegalArgumentException(
+						"delegateBuilders cannot contain null values. Got "
+								+ delegateBuilders);
+			}
+			this.delegateBuilders = delegateBuilders;
+		}
+
+		public UserDetails loadUserByUsername(String username)
+				throws UsernameNotFoundException {
+			if (delegate != null) {
+				return delegate.loadUserByUsername(username);
+			}
+
+			synchronized (delegateMonitor) {
+				if (delegate == null) {
+					for (AuthenticationManagerBuilder delegateBuilder : delegateBuilders) {
+						delegate = delegateBuilder.getDefaultUserDetailsService();
+						if (delegate != null) {
+							break;
+						}
+					}
+
+					if (delegate == null) {
+						throw new IllegalStateException("UserDetailsService is required.");
+					}
+					this.delegateBuilders = null;
+				}
+			}
+
+			return delegate.loadUserByUsername(username);
+		}
 	}
 	
 	static class DefaultPasswordEncoderAuthenticationManagerBuilder extends AuthenticationManagerBuilder {
