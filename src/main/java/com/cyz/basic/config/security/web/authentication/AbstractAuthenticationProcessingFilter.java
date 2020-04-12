@@ -39,12 +39,14 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 	
 	protected ApplicationEventPublisher eventPublisher;
 	protected MessageSourceAccessor messages;
+	private RememberMeServices rememberMeServices = new NullRememberMeServices();
 	protected AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
 	
 	private RequestMatcher requiresAuthenticationRequestMatcher;
 	private AuthenticationManager authenticationManager;
 	
 	private AuthenticationSuccessHandler successHandler = new SimpleAuthenticationSuccessHandler();
+	private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
 	
 	private boolean continueChainBeforeSuccessfulAuthentication = false;
 	
@@ -126,6 +128,11 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 			HttpServletResponse response, AuthenticationException failed)
 			throws IOException, ServletException {
 		
+	}
+	
+	public void setRememberMeServices(RememberMeServices rememberMeServices) {
+		Assert.notNull(rememberMeServices, "rememberMeServices cannot be null");
+		this.rememberMeServices = rememberMeServices;
 	}
 	
 	/**
@@ -255,6 +262,21 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 		this.authenticationManager = authenticationManager;
 	}
 	
+	/**
+	 * Sets the strategy used to handle a successful authentication. By default a
+	 * {@link SavedRequestAwareAuthenticationSuccessHandler} is used.
+	 */
+	public void setAuthenticationSuccessHandler(
+			AuthenticationSuccessHandler successHandler) {
+		Assert.notNull(successHandler, "successHandler cannot be null");
+		this.successHandler = successHandler;
+	}
 	
+	public void setAuthenticationFailureHandler(
+			AuthenticationFailureHandler failureHandler) {
+		Assert.notNull(failureHandler, "failureHandler cannot be null");
+		this.failureHandler = failureHandler;
+	}
+
 
 }

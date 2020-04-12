@@ -1,16 +1,23 @@
 package com.cyz.basic.config.security.config.annotation.web.configurers;
 
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.cyz.basic.config.security.authentication.AuthenticationDetailsSource;
+import com.cyz.basic.config.security.authentication.AuthenticationManager;
 import com.cyz.basic.config.security.authentication.AuthenticationSuccessHandler;
 import com.cyz.basic.config.security.authentication.SimpleAuthenticationSuccessHandler;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
 import com.cyz.basic.config.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import com.cyz.basic.config.security.web.authentication.AuthenticationFailureHandler;
+import com.cyz.basic.config.security.web.authentication.RememberMeServices;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
 public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecurityBuilder<B>, T extends AbstractAuthenticationFilterConfigurer<B, T, F>, F extends AbstractAuthenticationProcessingFilter> 
     extends AbstractHttpConfigurer<T, B>{
 
 	private F authFilter;
+	private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource;
 	private boolean enableLoginPage; //是否启用登录页
 	private String loginPage;
 	private String loginProcessingUrl;
@@ -132,6 +139,30 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	public final T permitAll(boolean permitAll) {
 		this.permitAll = permitAll;
 		return getSelf();
+	}
+	
+	@Override
+	public void configure(B http) throws Exception {
+
+		authFilter.setAuthenticationManager(http
+				.getSharedObject(AuthenticationManager.class));
+		authFilter.setAuthenticationSuccessHandler(successHandler);
+		authFilter.setAuthenticationFailureHandler(failureHandler);
+		if (authenticationDetailsSource != null) {
+			authFilter.setAuthenticationDetailsSource(authenticationDetailsSource);
+		}
+		/*SessionAuthenticationStrategy sessionAuthenticationStrategy = http
+				.getSharedObject(SessionAuthenticationStrategy.class);
+		if (sessionAuthenticationStrategy != null) {
+			authFilter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
+		}*/
+		RememberMeServices rememberMeServices = http
+				.getSharedObject(RememberMeServices.class);
+		if (rememberMeServices != null) {
+			authFilter.setRememberMeServices(rememberMeServices);
+		}
+		F filter = postProcess(authFilter);
+		http.addFilter(filter);
 	}
 	
 	/**
