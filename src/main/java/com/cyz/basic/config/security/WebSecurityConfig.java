@@ -8,11 +8,11 @@ import javax.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+import com.cyz.basic.config.security.access.vote.MyAuthenticatedVoter;
 import com.cyz.basic.config.security.authentication.AuthenticationSuccessHandler;
 import com.cyz.basic.config.security.config.annotation.authentication.configuration.WebSecurityConfigurerAdapter;
 import com.cyz.basic.config.security.config.annotation.web.builders.HttpSecurity;
 import com.cyz.basic.config.security.config.annotation.web.builders.WebSecurity;
-import com.cyz.basic.config.security.voter.MyAuthenticatedVoter;
 
 @EnableConfigurationProperties(value={SecurityProperties.class})
 public abstract class WebSecurityConfig extends WebSecurityConfigurerAdapter {

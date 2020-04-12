@@ -128,6 +128,16 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 			HttpServletResponse response, AuthenticationException failed)
 			throws IOException, ServletException {
 		
+		if (logger.isDebugEnabled()) {
+			logger.debug("Authentication request failed: " + failed.toString(), failed);
+			logger.debug("Updated SecurityContextHolder to contain null Authentication");
+			logger.debug("Delegating to authentication failure handler " + failureHandler);
+		}
+		
+		//暂时没有实现remember逻辑
+		//rememberMeServices.loginFail(request, response);
+
+		failureHandler.onAuthenticationFailure(request, response, failed);
 	}
 	
 	public void setRememberMeServices(RememberMeServices rememberMeServices) {
@@ -223,6 +233,18 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 	public void setMessageSource(MessageSource messageSource) {
 		this.messages = new MessageSourceAccessor(messageSource);
 	}
+	
+	/**
+	 * Indicates if the filter chain should be continued prior to delegation to
+	 * {@link #successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
+	 * , which may be useful in certain environment (such as Tapestry applications).
+	 * Defaults to <code>false</code>.
+	 */
+	public void setContinueChainBeforeSuccessfulAuthentication(
+			boolean continueChainBeforeSuccessfulAuthentication) {
+		this.continueChainBeforeSuccessfulAuthentication = continueChainBeforeSuccessfulAuthentication;
+	}
+
 
 	@Override
 	public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {

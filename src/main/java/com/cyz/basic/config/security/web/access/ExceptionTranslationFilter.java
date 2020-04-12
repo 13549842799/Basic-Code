@@ -20,6 +20,7 @@ import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 import com.cyz.basic.config.security.exception.AccessDeniedException;
 import com.cyz.basic.config.security.exception.AuthenticationException;
 import com.cyz.basic.config.security.exception.InsufficientAuthenticationException;
+import com.cyz.basic.config.security.web.AuthenticationEntryPoint;
 import com.cyz.basic.config.security.web.util.ThrowableAnalyzer;
 import com.cyz.basic.config.security.web.util.ThrowableCauseExtractor;
 import com.cyz.basic.util.HttpUtil;
@@ -62,10 +63,19 @@ import com.cyz.basic.util.HttpUtil.RespParams;
 public class ExceptionTranslationFilter extends GenericFilterBean {
 	
 	private AccessDeniedHandler accessDeniedHandler = new AccessDeniedHandlerImpl();
+	private AuthenticationEntryPoint authenticationEntryPoint;
 	private AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 	private ThrowableAnalyzer throwableAnalyzer = new DefaultThrowableAnalyzer();
 	
 	private final MessageSourceAccessor messages = null;
+	
+    public ExceptionTranslationFilter() {}
+	
+	public ExceptionTranslationFilter(AuthenticationEntryPoint authenticationEntryPoint) {
+		Assert.notNull(authenticationEntryPoint,
+				"authenticationEntryPoint cannot be null");
+		this.authenticationEntryPoint = authenticationEntryPoint;
+	}
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -113,6 +123,14 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 		}
 	}
 	
+	public AuthenticationEntryPoint getAuthenticationEntryPoint() {
+		return authenticationEntryPoint;
+	}
+	
+	protected AuthenticationTrustResolver getAuthenticationTrustResolver() {
+		return authenticationTrustResolver;
+	}
+	
 	private void handleSpringSecurityException(HttpServletRequest request,
 			HttpServletResponse response, FilterChain chain, RuntimeException exception)
 			throws IOException, ServletException {
@@ -158,12 +176,8 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 		// existing Authentication is no longer considered valid
 		SecurityContextHolder.getContext().clearAuthentication();
 		logger.debug("Calling Authentication entry point.");
-		//authenticationEntryPoint.commence(request, response, reason);
-		HttpUtil.responseResult(RespParams.create(req, resp).fail(reason.getMessage()));
-	}
-	
-	protected AuthenticationTrustResolver getAuthenticationTrustResolver() {
-		return authenticationTrustResolver;
+		authenticationEntryPoint.commence(req, resp, reason);
+		//HttpUtil.responseResult(RespParams.create(req, resp).fail(reason.getMessage())); 把这一句放进point中
 	}
 	
 	public void setAccessDeniedHandler(AccessDeniedHandler accessDeniedHandler) {

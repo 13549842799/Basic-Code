@@ -34,7 +34,7 @@ public class SimpleUrlAuthenticationFailureHandler implements AuthenticationFail
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
-		// TODO Auto-generated method stub
+		
 
 	}
 

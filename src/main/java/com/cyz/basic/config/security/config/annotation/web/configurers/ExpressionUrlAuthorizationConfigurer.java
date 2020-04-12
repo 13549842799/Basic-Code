@@ -13,6 +13,7 @@ import org.springframework.http.HttpMethod;
 import com.cyz.basic.config.security.access.AccessDecisionVoter;
 import com.cyz.basic.config.security.access.ConfigAttribute;
 import com.cyz.basic.config.security.access.SecurityConfig;
+import com.cyz.basic.config.security.access.vote.MyAuthenticatedVoter;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
 import com.cyz.basic.config.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
@@ -163,6 +164,8 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 	@Override
 	List<AccessDecisionVoter<? extends Object>> getDecisionVoters(H http) {
 		List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
+		MyAuthenticatedVoter voter = new MyAuthenticatedVoter();
+		decisionVoters.add(voter);
 		/*WebExpressionVoter expressionVoter = new WebExpressionVoter();
 		expressionVoter.setExpressionHandler(getExpressionHandler(http));*/
 		//decisionVoters.add(expressionVoter);
@@ -174,14 +177,14 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 	final DefaultFilterInvocationSecurityMetadataSource createMetadataSource(
 			H http) {
 		
-		ApplicationContext context = http.getSharedObject(ApplicationContext.class);
+		/*ApplicationContext context = http.getSharedObject(ApplicationContext.class);
 		
 		DefaultFilterInvocationSecurityMetadataSource source = context.getBean(DefaultFilterInvocationSecurityMetadataSource.class);
-		
+
 		if (source != null) {
 			logger.info("use the MetadataSource as the bean");
 			return source;
-		}
+		}*/
 		
 		LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = REGISTRY
 				.createRequestMap();

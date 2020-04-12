@@ -1,8 +1,17 @@
 package com.cyz.basic.config.security.config.annotation.web.configurers;
 
+import java.util.LinkedHashMap;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
+import com.cyz.basic.config.security.web.AuthenticationEntryPoint;
 import com.cyz.basic.config.security.web.access.AccessDeniedHandler;
 import com.cyz.basic.config.security.web.access.ExceptionTranslationFilter;
+import com.cyz.basic.config.security.web.authentication.DelegatingAuthenticationEntryPoint;
+import com.cyz.basic.config.security.web.authentication.Http403ForbiddenEntryPoint;
+import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
 /**
  * Adds exception handling for Spring Security related exceptions to an application. All
@@ -39,7 +48,14 @@ import com.cyz.basic.config.security.web.access.ExceptionTranslationFilter;
 public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>> extends
     AbstractHttpConfigurer<ExceptionHandlingConfigurer<H>, H> {
 	
+	protected final Log logger = LogFactory.getLog(getClass());
+	
+	
+	private AuthenticationEntryPoint authenticationEntryPoint;
+	
 	private AccessDeniedHandler accessDeniedHandler;
+	
+	private LinkedHashMap<RequestMatcher, AuthenticationEntryPoint> defaultEntryPointMappings = new LinkedHashMap<>();
 	
 	/**
 	 * Creates a new instance
@@ -69,14 +85,71 @@ public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>>
 		return this.accessDeniedHandler;
 	}
 	
+	/**
+	 * Gets any explicitly configured {@link AuthenticationEntryPoint}
+	 * @return
+	 */
+	AuthenticationEntryPoint getAuthenticationEntryPoint() {
+		return this.authenticationEntryPoint;
+	}
+	
+	/**
+	 * Sets a default {@link AuthenticationEntryPoint} to be used which prefers being
+	 * invoked for the provided {@link RequestMatcher}. If only a single default
+	 * {@link AuthenticationEntryPoint} is specified, it will be what is used for the
+	 * default {@link AuthenticationEntryPoint}. If multiple default
+	 * {@link AuthenticationEntryPoint} instances are configured, then a
+	 * {@link DelegatingAuthenticationEntryPoint} will be used.
+	 *
+	 * @param entryPoint the {@link AuthenticationEntryPoint} to use
+	 * @param preferredMatcher the {@link RequestMatcher} for this default
+	 * {@link AuthenticationEntryPoint}
+	 * @return the {@link ExceptionHandlingConfigurer} for further customizations
+	 */
+	public ExceptionHandlingConfigurer<H> defaultAuthenticationEntryPointFor(
+			AuthenticationEntryPoint entryPoint, RequestMatcher preferredMatcher) {
+		this.defaultEntryPointMappings.put(preferredMatcher, entryPoint);
+		return this;
+	}
+	
 	@Override
 	public void configure(H http) throws Exception {
-		//AuthenticationEntryPoint entryPoint = getAuthenticationEntryPoint(http);
-		ExceptionTranslationFilter exceptionTranslationFilter = new ExceptionTranslationFilter();
+		AuthenticationEntryPoint entryPoint = getAuthenticationEntryPoint(http);
+		ExceptionTranslationFilter exceptionTranslationFilter = new ExceptionTranslationFilter(entryPoint);
 		if (accessDeniedHandler != null) {
 			exceptionTranslationFilter.setAccessDeniedHandler(accessDeniedHandler);
 		}
 		exceptionTranslationFilter = postProcess(exceptionTranslationFilter);
 		http.addFilter(exceptionTranslationFilter);
+	}
+	
+	/**
+	 * Gets the {@link AuthenticationEntryPoint} according to the rules specified by
+	 * {@link #authenticationEntryPoint(AuthenticationEntryPoint)}
+	 * @param http the {@link HttpSecurity} used to look up shared
+	 * {@link AuthenticationEntryPoint}
+	 * @return the {@link AuthenticationEntryPoint} to use
+	 */
+	AuthenticationEntryPoint getAuthenticationEntryPoint(H http) {
+		AuthenticationEntryPoint entryPoint = this.authenticationEntryPoint;
+		if (entryPoint == null) {
+			entryPoint = createDefaultEntryPoint(http);
+		}
+		return entryPoint;
+	}
+
+	private AuthenticationEntryPoint createDefaultEntryPoint(H http) {
+		if (defaultEntryPointMappings.isEmpty()) {
+			logger.info("defaultEntryPointMappings is empty , so it is http 403");
+			return new Http403ForbiddenEntryPoint();
+		}
+		if (defaultEntryPointMappings.size() == 1) {
+			return defaultEntryPointMappings.values().iterator().next();
+		}
+		DelegatingAuthenticationEntryPoint entryPoint = new DelegatingAuthenticationEntryPoint(
+				defaultEntryPointMappings);
+		entryPoint.setDefaultEntryPoint(defaultEntryPointMappings.values().iterator()
+				.next());
+		return entryPoint;
 	}
 }

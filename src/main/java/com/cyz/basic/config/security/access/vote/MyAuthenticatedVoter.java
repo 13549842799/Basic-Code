@@ -1,9 +1,8 @@
-package com.cyz.basic.config.security.voter;
+package com.cyz.basic.config.security.access.vote;
 
 import java.util.Collection;
 
 import com.cyz.basic.config.security.access.ConfigAttribute;
-import com.cyz.basic.config.security.access.vote.AuthenticatedVoter;
 import com.cyz.basic.config.security.core.Authentication;
 import com.cyz.basic.config.security.detail.GrantedAuthority;
 
