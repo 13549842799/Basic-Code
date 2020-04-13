@@ -24,7 +24,7 @@ public class SecurityProperties implements SecurityPrerequisite {
 	
 	private String logoutUrl;
 	
-	private Long expireTime = -1l; //毫秒
+	private long expireTime = -1l; //毫秒
 	
 	/**
 	 * Order applied to the WebSecurityConfigurerAdapter that is used to configure basic
@@ -110,11 +110,11 @@ public class SecurityProperties implements SecurityPrerequisite {
 		this.logoutUrl = logoutUrl;
 	}
 
-	public Long getExpireTime() {
+	public long getExpireTime() {
 		return expireTime;
 	}
 
-	public void setExpireTime(Long expireTime) {
+	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;
 	}
 	

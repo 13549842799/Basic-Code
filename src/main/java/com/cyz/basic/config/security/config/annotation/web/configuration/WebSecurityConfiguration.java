@@ -10,6 +10,7 @@ import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportAware;
@@ -21,6 +22,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import com.cyz.basic.config.security.SecurityProperties;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.SecurityConfigurer;
 import com.cyz.basic.config.security.config.annotation.authentication.configuration.WebSecurityConfigurerAdapter;
@@ -58,6 +60,7 @@ import com.cyz.basic.config.security.core.context.SecurityContextHolder;
  * @since 3.2
  */
 @Configuration
+@EnableConfigurationProperties(value={SecurityProperties.class})
 public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAware{
 
 	private Boolean debugEnabled;
@@ -80,8 +83,8 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 	}
 	
 	@Autowired
-	public void setCyzSecurityContextHolder(RedisTemplate<String, Object> redisTemplate) {
-		SecurityContextHolder.inintHolder(redisTemplate);
+	public void setCyzSecurityContextHolder(RedisTemplate<String, Object> redisTemplate, SecurityProperties properties) {
+		SecurityContextHolder.inintHolder(redisTemplate, properties);
 	}
 	
 	@Bean(name = AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)

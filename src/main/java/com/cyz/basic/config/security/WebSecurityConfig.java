@@ -60,7 +60,6 @@ public abstract class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().anyRequest().authenticated()
 		.and().formLogin().loginProcessingUrl(properties.getLoginUrl()).permitAll();//登录行为任意访问     
 		http.logout().clearAuthentication(true).logoutUrl(properties.getLogoutUrl()); //只允许已登录的访问
-		
 	}
 
 

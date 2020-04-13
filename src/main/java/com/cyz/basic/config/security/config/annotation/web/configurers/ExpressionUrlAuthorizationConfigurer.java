@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpMethod;
 
@@ -141,6 +142,19 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 		public H and() {
 			return ExpressionUrlAuthorizationConfigurer.this.and();
 		}
+
+		@Override
+		public ExpressionUrlAuthorizationConfigurer<H>.AuthorizedUrl mvcMatchers(String... mvcPatterns) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public ExpressionUrlAuthorizationConfigurer<H>.AuthorizedUrl mvcMatchers(HttpMethod method,
+				String... mvcPatterns) {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	
 	}
 	
@@ -177,14 +191,12 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 	final DefaultFilterInvocationSecurityMetadataSource createMetadataSource(
 			H http) {
 		
-		/*ApplicationContext context = http.getSharedObject(ApplicationContext.class);
-		
-		DefaultFilterInvocationSecurityMetadataSource source = context.getBean(DefaultFilterInvocationSecurityMetadataSource.class);
-
+		ApplicationContext context = http.getSharedObject(ApplicationContext.class);
+		DefaultFilterInvocationSecurityMetadataSource source = getBeanOrNull(context, DefaultFilterInvocationSecurityMetadataSource.class);
 		if (source != null) {
 			logger.info("use the MetadataSource as the bean");
 			return source;
-		}*/
+		}
 		
 		LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = REGISTRY
 				.createRequestMap();
@@ -394,6 +406,14 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 			}
 			interceptUrl(requestMatchers, SecurityConfig.createList(attribute));
 			return ExpressionUrlAuthorizationConfigurer.this.REGISTRY;
+		}
+	}
+	
+	private <T> T getBeanOrNull(ApplicationContext applicationContext, Class<T> type) {
+		try {
+			return applicationContext.getBean(type);
+		} catch(NoSuchBeanDefinitionException notFound) {
+			return null;
 		}
 	}
 

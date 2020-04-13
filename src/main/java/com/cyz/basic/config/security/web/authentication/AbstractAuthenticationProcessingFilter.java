@@ -81,12 +81,12 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
-		
+		logger.info("into the userNamepasswordFilter");
 		if (!requiresAuthentication(request, response)) {
 			chain.doFilter(request, response);
 			return;
 		}
-		
+		logger.info("begin to valid");
 		if (logger.isDebugEnabled()) {
 			logger.debug("Request is to process authentication");
 		}

@@ -250,11 +250,14 @@ public final class LogoutConfigurer<H extends HttpSecurityBuilder<H>> extends Ab
 			//this.logoutRequestMatcher = new AntPathRequestMatcher(this.logoutUrl, "POST");
 		//}
 		//else {
-			this.logoutRequestMatcher = new OrRequestMatcher(
+			/*this.logoutRequestMatcher = new OrRequestMatcher(
 				new AntPathRequestMatcher(this.logoutUrl, "GET"),
 				new AntPathRequestMatcher(this.logoutUrl, "POST"),
 				new AntPathRequestMatcher(this.logoutUrl, "PUT"),
 				new AntPathRequestMatcher(this.logoutUrl, "DELETE")
+			);*/
+		    this.logoutRequestMatcher = new OrRequestMatcher(
+				new AntPathRequestMatcher(this.logoutUrl, "POST")
 			);
 		//}
 		return this.logoutRequestMatcher;

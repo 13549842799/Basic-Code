@@ -13,6 +13,7 @@ import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
+import com.cyz.basic.config.SpringConfiguration.SpringMessageSource;
 import com.cyz.basic.config.security.authentication.AuthenticationTrustResolver;
 import com.cyz.basic.config.security.authentication.AuthenticationTrustResolverImpl;
 import com.cyz.basic.config.security.core.Authentication;
@@ -65,7 +66,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 	private AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 	private ThrowableAnalyzer throwableAnalyzer = new DefaultThrowableAnalyzer();
 	
-	private final MessageSourceAccessor messages = null;
+	private final MessageSourceAccessor messages = SpringMessageSource.getAccess();
 	
 	public ExceptionTranslationFilter() {}
 	
@@ -173,6 +174,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 		SecurityContextHolder.getContext().clearAuthentication();
 		logger.debug("Calling Authentication entry point.");
 		authenticationEntryPoint.commence(req, resp, reason);
+		logger.info(authenticationEntryPoint.getClass().getName());
 		//HttpUtil.responseResult(RespParams.create(req, resp).fail(reason.getMessage()));
 	}
 	

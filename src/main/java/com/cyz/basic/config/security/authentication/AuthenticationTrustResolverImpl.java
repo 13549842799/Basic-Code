@@ -4,10 +4,9 @@ import com.cyz.basic.config.security.core.Authentication;
 
 public class AuthenticationTrustResolverImpl implements AuthenticationTrustResolver {
 
-	/*private Class<? extends Authentication> anonymousClass = AnonymousAuthenticationToken.class;
-	private Class<? extends Authentication> rememberMeClass = RememberMeAuthenticationToken.class;*/
+	private Class<? extends Authentication> anonymousClass = AnonymousAuthenticationToken.class;
+	//private Class<? extends Authentication> rememberMeClass = RememberMeAuthenticationToken.class;
 	
-	private Class<? extends Authentication> anonymousClass = null;
 	private Class<? extends Authentication> rememberMeClass = null;
 
 	// ~ Methods

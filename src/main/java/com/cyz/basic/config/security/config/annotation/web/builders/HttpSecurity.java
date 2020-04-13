@@ -9,6 +9,7 @@ import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpMethod;
 import org.springframework.util.Assert;
 
 import com.cyz.basic.config.security.authentication.AuthenticationManager;
@@ -18,6 +19,7 @@ import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.SecurityBuilder;
 import com.cyz.basic.config.security.config.annotation.SecurityConfigurerAdapter;
 import com.cyz.basic.config.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import com.cyz.basic.config.security.config.annotation.web.AbstractRequestMatcherRegistry;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
 import com.cyz.basic.config.security.config.annotation.web.configurers.AnonymousConfigurer;
 import com.cyz.basic.config.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
@@ -27,14 +29,16 @@ import com.cyz.basic.config.security.config.annotation.web.configurers.HeadersCo
 import com.cyz.basic.config.security.config.annotation.web.configurers.LogoutConfigurer;
 import com.cyz.basic.config.security.core.userdetails.UserDetailsService;
 import com.cyz.basic.config.security.web.DefaultSecurityFilterChain;
+import com.cyz.basic.config.security.web.servlet.util.matcher.MvcRequestMatcher;
 import com.cyz.basic.config.security.web.util.matcher.AnyRequestMatcher;
+import com.cyz.basic.config.security.web.util.matcher.OrRequestMatcher;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
 public final class HttpSecurity extends
     AbstractConfiguredSecurityBuilder<DefaultSecurityFilterChain, HttpSecurity> implements 
     SecurityBuilder<DefaultSecurityFilterChain>, HttpSecurityBuilder<HttpSecurity>{
 	
-	//private final RequestMatcherConfigurer requestMatcherConfigurer;
+	private final RequestMatcherConfigurer requestMatcherConfigurer;
 	private List<Filter> filters = new ArrayList<>();
 	private RequestMatcher requestMatcher = AnyRequestMatcher.INSTANCE;
 	private FilterComparator comparator = new FilterComparator();
@@ -60,7 +64,7 @@ public final class HttpSecurity extends
 		}
 		ApplicationContext context = (ApplicationContext) sharedObjects
 				.get(ApplicationContext.class);
-		//this.requestMatcherConfigurer = new RequestMatcherConfigurer(context);
+		this.requestMatcherConfigurer = new RequestMatcherConfigurer(context);
 	}
 	
 	private ApplicationContext getContext() {
@@ -214,6 +218,164 @@ public final class HttpSecurity extends
 							+ " does not have a registered order and cannot be added without a specified order. Consider using addFilterBefore or addFilterAfter instead.");
 		}
 		this.filters.add(filter);
+		return this;
+	}
+	
+	/**
+	 * Adds the Filter at the location of the specified Filter class. For example, if you
+	 * want the filter CustomFilter to be registered in the same position as
+	 * {@link UsernamePasswordAuthenticationFilter}, you can invoke:
+	 *
+	 * <pre>
+	 * addFilterAt(new CustomFilter(), UsernamePasswordAuthenticationFilter.class)
+	 * </pre>
+	 *
+	 * Registration of multiple Filters in the same location means their ordering is not
+	 * deterministic. More concretely, registering multiple Filters in the same location
+	 * does not override existing Filters. Instead, do not register Filters you do not
+	 * want to use.
+	 *
+	 * @param filter the Filter to register
+	 * @param atFilter the location of another {@link Filter} that is already registered
+	 * (i.e. known) with Spring Security.
+	 * @return the {@link HttpSecurity} for further customizations
+	 */
+	public HttpSecurity addFilterAt(Filter filter, Class<? extends Filter> atFilter) {
+		this.comparator.registerAt(filter.getClass(), atFilter);
+		return addFilter(filter);
+	}
+	
+	/**
+	 * Allows specifying which {@link HttpServletRequest} instances this
+	 * {@link HttpSecurity} will be invoked on. This method allows for easily invoking the
+	 * {@link HttpSecurity} for multiple different {@link RequestMatcher} instances. If
+	 * only a single {@link RequestMatcher} is necessary consider using {@link #mvcMatcher(String)},
+	 * {@link #antMatcher(String)}, {@link #regexMatcher(String)}, or
+	 * {@link #requestMatcher(RequestMatcher)}.
+	 *
+	 * <p>
+	 * Invoking {@link #requestMatchers()} will not override previous invocations of {@link #mvcMatcher(String)}},
+	 * {@link #requestMatchers()}, {@link #antMatcher(String)},
+	 * {@link #regexMatcher(String)}, and {@link #requestMatcher(RequestMatcher)}.
+	 * </p>
+	 *
+	 * <h3>Example Configurations</h3>
+	 *
+	 * The following configuration enables the {@link HttpSecurity} for URLs that begin
+	 * with "/api/" or "/oauth/".
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class RequestMatchersSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(HttpSecurity http) throws Exception {
+	 * 		http
+	 * 			.requestMatchers()
+	 * 				.antMatchers(&quot;/api/**&quot;, &quot;/oauth/**&quot;)
+	 * 				.and()
+	 * 			.authorizeRequests()
+	 * 				.antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;)
+	 * 				.and()
+	 * 			.httpBasic();
+	 * 	}
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	 * 		auth
+	 * 			.inMemoryAuthentication()
+	 * 				.withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * The configuration below is the same as the previous configuration.
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class RequestMatchersSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(HttpSecurity http) throws Exception {
+	 * 		http
+	 * 			.requestMatchers()
+	 * 				.antMatchers(&quot;/api/**&quot;)
+	 * 				.antMatchers(&quot;/oauth/**&quot;)
+	 * 				.and()
+	 * 			.authorizeRequests()
+	 * 				.antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;)
+	 * 				.and()
+	 * 			.httpBasic();
+	 * 	}
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	 * 		auth
+	 * 			.inMemoryAuthentication()
+	 * 				.withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * The configuration below is also the same as the above configuration.
+	 *
+	 * <pre>
+	 * &#064;Configuration
+	 * &#064;EnableWebSecurity
+	 * public class RequestMatchersSecurityConfig extends WebSecurityConfigurerAdapter {
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(HttpSecurity http) throws Exception {
+	 * 		http
+	 * 			.requestMatchers()
+	 * 				.antMatchers(&quot;/api/**&quot;)
+	 * 				.and()
+	 *			 .requestMatchers()
+	 * 				.antMatchers(&quot;/oauth/**&quot;)
+	 * 				.and()
+	 * 			.authorizeRequests()
+	 * 				.antMatchers(&quot;/**&quot;).hasRole(&quot;USER&quot;)
+	 * 				.and()
+	 * 			.httpBasic();
+	 * 	}
+	 *
+	 * 	&#064;Override
+	 * 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	 * 		auth
+	 * 			.inMemoryAuthentication()
+	 * 				.withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 * @return the {@link RequestMatcherConfigurer} for further customizations
+	 */
+	public RequestMatcherConfigurer requestMatchers() {
+		return requestMatcherConfigurer;
+	}
+	
+	/**
+	 * Allows configuring the {@link HttpSecurity} to only be invoked when matching the
+	 * provided {@link RequestMatcher}. If more advanced configuration is necessary,
+	 * consider using {@link #requestMatchers()}.
+	 *
+	 * <p>
+	 * Invoking {@link #requestMatcher(RequestMatcher)} will override previous invocations
+	 * of {@link #requestMatchers()}, {@link #mvcMatcher(String)}, {@link #antMatcher(String)},
+	 * {@link #regexMatcher(String)}, and {@link #requestMatcher(RequestMatcher)}.
+	 * </p>
+	 *
+	 * @param requestMatcher the {@link RequestMatcher} to use (i.e. new
+	 * AntPathRequestMatcher("/admin/**","GET") )
+	 * @return the {@link HttpSecurity} for further customizations
+	 * @see #requestMatchers()
+	 * @see #antMatcher(String)
+	 * @see #regexMatcher(String)
+	 */
+	public HttpSecurity requestMatcher(RequestMatcher requestMatcher) {
+		this.requestMatcher = requestMatcher;
 		return this;
 	}
 
@@ -490,5 +652,88 @@ public final class HttpSecurity extends
 	 */
 	public AnonymousConfigurer<HttpSecurity> anonymous() throws Exception {
 		return getOrApply(new AnonymousConfigurer<>());
+	}
+	
+	/**
+	 * An extension to {@link RequestMatcherConfigurer} that allows optionally configuring
+	 * the servlet path.
+	 *
+	 * @author Rob Winch
+	 */
+	public final class MvcMatchersRequestMatcherConfigurer extends RequestMatcherConfigurer {
+
+		/**
+		 * Creates a new instance
+		 * @param context the {@link ApplicationContext} to use
+		 * @param matchers the {@link MvcRequestMatcher} instances to set the servlet path
+		 * on if {@link #servletPath(String)} is set.
+		 */
+		private MvcMatchersRequestMatcherConfigurer(ApplicationContext context,
+				List<MvcRequestMatcher> matchers) {
+			super(context);
+			this.matchers = new ArrayList<>(matchers);
+		}
+
+		public RequestMatcherConfigurer servletPath(String servletPath) {
+			for (RequestMatcher matcher : this.matchers) {
+				((MvcRequestMatcher) matcher).setServletPath(servletPath);
+			}
+			return this;
+		}
+
+	}
+	
+	/**
+	 * Allows mapping HTTP requests that this {@link HttpSecurity} will be used for
+	 *
+	 * @author Rob Winch
+	 * @since 3.2
+	 */
+	public class RequestMatcherConfigurer
+			extends AbstractRequestMatcherRegistry<RequestMatcherConfigurer> {
+
+		protected List<RequestMatcher> matchers = new ArrayList<>();
+
+		/**
+		 * @param context
+		 */
+		private RequestMatcherConfigurer(ApplicationContext context) {
+			setApplicationContext(context);
+		}
+
+		@Override
+		public MvcMatchersRequestMatcherConfigurer mvcMatchers(HttpMethod method,
+				String... mvcPatterns) {
+			List<MvcRequestMatcher> mvcMatchers = createMvcMatchers(method, mvcPatterns);
+			setMatchers(mvcMatchers);
+			return new MvcMatchersRequestMatcherConfigurer(getContext(), mvcMatchers);
+		}
+
+		@Override
+		public MvcMatchersRequestMatcherConfigurer mvcMatchers(String... patterns) {
+			return mvcMatchers(null, patterns);
+		}
+
+		@Override
+		protected RequestMatcherConfigurer chainRequestMatchers(
+				List<RequestMatcher> requestMatchers) {
+			setMatchers(requestMatchers);
+			return this;
+		}
+
+		private void setMatchers(List<? extends RequestMatcher> requestMatchers) {
+			this.matchers.addAll(requestMatchers);
+			requestMatcher(new OrRequestMatcher(this.matchers));
+		}
+
+		/**
+		 * Return the {@link HttpSecurity} for further customizations
+		 *
+		 * @return the {@link HttpSecurity} for further customizations
+		 */
+		public HttpSecurity and() {
+			return HttpSecurity.this;
+		}
+
 	}
 }

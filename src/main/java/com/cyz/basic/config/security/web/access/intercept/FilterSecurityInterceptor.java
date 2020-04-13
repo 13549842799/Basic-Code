@@ -12,6 +12,7 @@ import javax.servlet.ServletResponse;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceAccessor;
 
+import com.cyz.basic.config.SpringConfiguration.SpringMessageSource;
 import com.cyz.basic.config.security.access.SecurityMetadataSource;
 import com.cyz.basic.config.security.access.intercept.AbstractSecurityInterceptor;
 import com.cyz.basic.config.security.web.FilterInvocation;
@@ -27,7 +28,7 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 	 */
 	private boolean observeOncePerRequest = true;
 
-	protected MessageSourceAccessor messages = null;
+	protected MessageSourceAccessor messages = SpringMessageSource.getAccess();
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {

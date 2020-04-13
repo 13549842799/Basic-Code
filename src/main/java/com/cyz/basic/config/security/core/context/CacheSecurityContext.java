@@ -22,6 +22,11 @@ public class CacheSecurityContext implements CyzSecurityContext {
 	public CacheSecurityContext(RedisTemplate<String, Object> redisTemplate) {
 		this.redisTemplate = redisTemplate;
 	}
+	
+	public CacheSecurityContext(RedisTemplate<String, Object> redisTemplate, SecurityProperties properties) {
+		this.redisTemplate = redisTemplate;
+		this.properties = properties;
+	}
 
 	/**
 	 * 
@@ -67,7 +72,7 @@ public class CacheSecurityContext implements CyzSecurityContext {
 		
 		String token = reqeust.getHeader("x-token");
          
-	    token = token != null ? token : "";
+	    token = token != null ? token : "session_" + reqeust.getRequestedSessionId();
 		
 		return token;
 	}

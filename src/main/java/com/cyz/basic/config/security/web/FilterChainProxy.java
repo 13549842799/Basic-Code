@@ -1,13 +1,11 @@
 package com.cyz.basic.config.security.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -16,11 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.filter.GenericFilterBean;
 
-import com.cyz.basic.config.SpringContextHolder;
-import com.cyz.basic.config.security.WebSecurityConfig;
 import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 import com.cyz.basic.config.security.web.firewall.FirewalledRequest;
 import com.cyz.basic.config.security.web.firewall.HttpFirewall;
@@ -121,9 +116,6 @@ import com.cyz.basic.config.security.web.firewall.StrictHttpFirewall;
  * @author Luke Taylor
  * @author Rob Winch
  */
-//@WebFilter(urlPatterns="/*")
-//@Component
-//@DependsOn("springContextHolder") //表示在springContextHolder（bean名）加载后再加载当前类
 public class FilterChainProxy extends GenericFilterBean{
 	
 	private static final Log logger = LogFactory.getLog(FilterChainProxy.class);
@@ -165,7 +157,7 @@ public class FilterChainProxy extends GenericFilterBean{
 				doFilterInternal(request, response, chain);
 			}
 			finally {
-				SecurityContextHolder.getContext().clearAuthentication();
+				//SecurityContextHolder.getContext().clearAuthentication();
 				request.removeAttribute(FILTER_APPLIED);
 			}
 		}

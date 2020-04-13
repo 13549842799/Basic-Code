@@ -16,7 +16,7 @@ import com.cyz.basic.config.security.detail.GrantedAuthority;
 public abstract class AbstractAuthenticationToken implements Authentication
 ,CredentialsContainer {
 
-	private final Collection<GrantedAuthority> authorities;
+	private Collection<GrantedAuthority> authorities;
 	private Object details;
 	private boolean authenticated = false;
 

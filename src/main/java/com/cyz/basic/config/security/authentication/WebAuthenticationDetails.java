@@ -13,9 +13,11 @@ public class WebAuthenticationDetails implements Serializable {
 	 */
 	private static final long serialVersionUID = 6896394917272112891L;
 	
-	private final String remoteAddress;
-	private final String sessionId;
-	private final String token;
+	private String remoteAddress;
+	private String sessionId;
+	private String token;
+	
+	public WebAuthenticationDetails() {}
 	
 	/**
 	 * Records the remote address and will also set the session Id if a session already

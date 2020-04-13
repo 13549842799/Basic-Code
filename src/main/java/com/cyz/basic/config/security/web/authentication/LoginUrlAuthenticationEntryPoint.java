@@ -12,11 +12,14 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import com.cyz.basic.config.security.exception.AuthenticationException;
+import com.cyz.basic.config.security.exception.InsufficientAuthenticationException;
 import com.cyz.basic.config.security.web.AuthenticationEntryPoint;
+import com.cyz.basic.config.security.web.JsonResponseStrategy;
 import com.cyz.basic.config.security.web.PortMapper;
 import com.cyz.basic.config.security.web.PortMapperImpl;
 import com.cyz.basic.config.security.web.PortResolver;
 import com.cyz.basic.config.security.web.PortResolverImpl;
+import com.cyz.basic.config.security.web.ResponseStrategy;
 import com.cyz.basic.util.HttpUtil;
 import com.cyz.basic.util.HttpUtil.RespParams;
 
@@ -61,12 +64,18 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 	private PortResolver portResolver = new PortResolverImpl();
 	
 	private boolean forceHttps = false;
+	
+	private ResponseStrategy strategy = new JsonResponseStrategy();
 
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		HttpUtil.responseResult(RespParams.create(request, response).fail(authException.getMessage()));
+		logger.info("判断登录问题类型,返回json");
+		if (authException instanceof InsufficientAuthenticationException) {
+			strategy.sendResponse(request, response, RespParams.create(request, response).ReLogin());
+			return;
+		}
+		strategy.sendResponse(request, response, RespParams.create(request, response).fail(authException.getMessage()));
 	}
 
 	@Override

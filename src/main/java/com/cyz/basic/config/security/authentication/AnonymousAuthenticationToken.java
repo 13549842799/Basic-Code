@@ -8,13 +8,18 @@ import org.springframework.util.Assert;
 import com.cyz.basic.config.security.detail.GrantedAuthority;
 
 public class AnonymousAuthenticationToken extends AbstractAuthenticationToken implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-	private final Object principal;
-	private final int keyHash;
+	
+	private static final long serialVersionUID = -5759636775878580243L;
+	private static final String DEFAULT_USERNAME = "initUsername";
+	private Object principal;
+	private int keyHash;
 
 	// ~ Constructors
 	// ===================================================================================================
+	
+	public AnonymousAuthenticationToken() {
+		this(-1, DEFAULT_USERNAME, null);
+	}
 
 	/**
 	 * Constructor.
@@ -44,7 +49,7 @@ public class AnonymousAuthenticationToken extends AbstractAuthenticationToken im
 		if (principal == null || "".equals(principal)) {
 			throw new IllegalArgumentException("principal cannot be null or empty");
 		}
-		Assert.notEmpty(authorities, "authorities cannot be null or empty");
+		//Assert.notEmpty(authorities, "authorities cannot be null or empty");
 
 		this.keyHash = keyHash;
 		this.principal = principal;

@@ -17,16 +17,16 @@ public final class DelegatingApplicationListener implements ApplicationListener<
     private List<SmartApplicationListener> listeners = new CopyOnWriteArrayList<>();
 
 	public void onApplicationEvent(ApplicationEvent event) {
-	if (event == null) {
-		return;
-	}
-	for (SmartApplicationListener listener : listeners) {
-		Object source = event.getSource();
-		if (source != null && listener.supportsEventType(event.getClass())
-				&& listener.supportsSourceType(source.getClass())) {
-			listener.onApplicationEvent(event);
+		if (event == null) {
+			return;
 		}
-	}
+		for (SmartApplicationListener listener : listeners) {
+			Object source = event.getSource();
+			if (source != null && listener.supportsEventType(event.getClass())
+					&& listener.supportsSourceType(source.getClass())) {
+				listener.onApplicationEvent(event);
+			}
+		}
 	}
 
 	/**
@@ -36,9 +36,9 @@ public final class DelegatingApplicationListener implements ApplicationListener<
 	* null.
 	*/
 	public void addListener(SmartApplicationListener smartApplicationListener) {
-	Assert.notNull(smartApplicationListener,
-			"smartApplicationListener cannot be null");
-	listeners.add(smartApplicationListener);
+		Assert.notNull(smartApplicationListener,
+				"smartApplicationListener cannot be null");
+		listeners.add(smartApplicationListener);
 	}
 }
 

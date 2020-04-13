@@ -295,7 +295,7 @@ public abstract class HttpUtil {
     	}
     	
     	private RespParams fail(String message, int code) {
-    		this.code = ResponseResult.RESPONSE_FAIL;
+    		this.code = code;
     		this.errorMessage = message;
     		return this;
     	}

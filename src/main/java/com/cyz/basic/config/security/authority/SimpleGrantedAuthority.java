@@ -19,7 +19,11 @@ public class SimpleGrantedAuthority implements GrantedAuthority {
 	 * 
 	 */
 	private static final long serialVersionUID = 7410075293399772470L;
-	private final String role;
+	private String role;
+	
+	public SimpleGrantedAuthority() {
+		this.role = "ROLE_INIT";
+	}
 
 	public SimpleGrantedAuthority(String role) {
 		Assert.hasText(role, "A granted authority textual representation is required");

@@ -66,7 +66,7 @@ public class LogoutFilter extends GenericFilterBean {
 		HttpServletResponse response = (HttpServletResponse) res;
 		
 		if (requiresLogout(request, response)) {
-			
+			logger.info("getAuthentication in logoutFilter");
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			
 			if (logger.isDebugEnabled()) {
