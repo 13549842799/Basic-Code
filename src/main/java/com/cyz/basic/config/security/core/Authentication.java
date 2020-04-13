@@ -97,4 +97,12 @@ public interface Authentication extends Principal,Serializable {
 		 * {@link #isAuthenticated()}
 		 */
 		void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException;
+		
+		/**
+		 * cyz 形成一个新的对象
+		 * @return
+		 */
+		default Object result() {
+			return this;
+		};
 }

@@ -1,6 +1,6 @@
 package com.cyz.basic.config.security.exception;
 
-public class UsernameNotFoundException extends RuntimeException{
+public class UsernameNotFoundException extends AuthenticationException{
 
 	/**
 	 * 
@@ -8,8 +8,7 @@ public class UsernameNotFoundException extends RuntimeException{
 	private static final long serialVersionUID = 254991862299169133L;
 
 	public UsernameNotFoundException() {
-		super();
-		// TODO Auto-generated constructor stub
+		super("用户名有问题");
 	}
 
 	public UsernameNotFoundException(String message) {

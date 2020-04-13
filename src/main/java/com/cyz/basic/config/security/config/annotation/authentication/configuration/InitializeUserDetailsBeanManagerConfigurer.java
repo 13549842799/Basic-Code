@@ -49,7 +49,10 @@ public class InitializeUserDetailsBeanManagerConfigurer extends GlobalAuthentica
 		
 			PasswordEncoder passwordEncoder = getBeanOrNull(PasswordEncoder.class);
 		
-			DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+			DaoAuthenticationProvider provider = getBeanOrNull(DaoAuthenticationProvider.class);
+			if (provider == null) {
+				provider = new DaoAuthenticationProvider();
+			}
 			provider.setUserDetailsService(userDetailsService);
 			if (passwordEncoder != null) {
 				provider.setPasswordEncoder(passwordEncoder);

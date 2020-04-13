@@ -291,10 +291,28 @@ public abstract class HttpUtil {
     	}
     	
     	public RespParams fail(String message) {
+    		return fail(message, ResponseResult.RESPONSE_FAIL);
+    	}
+    	
+    	private RespParams fail(String message, int code) {
     		this.code = ResponseResult.RESPONSE_FAIL;
     		this.errorMessage = message;
     		return this;
     	}
+    	
+    	public RespParams ReLogin() {
+    		return fail("登录过期，请重新登录", ResponseResult.RESPONSE_FAIL_UNLOGIN);
+    	}
+    	
+    	public RespParams UsernameError() {
+    		return fail("不存在用户名", ResponseResult.RESPONSE_FAIL_USERNAME);
+    	}
+    	
+    	public RespParams PasswordError() {
+    		return fail("密码错误", ResponseResult.RESPONSE_FAIL_PASSWORD);
+    	}
+    	
+    	
     	
 
 		public HttpServletRequest getReq() {

@@ -19,36 +19,40 @@ public class ResponseResult<T> implements Serializable{
 	 */
 	private static final long serialVersionUID = 4185740114021603198L;
 	/**
-	 * �ɹ�
+	 * 请求成功
 	 */
 	public static final int RESPONSE_SUCCESS =200;
 	/**
-	 * ʧ��
+	 * 请求失败（业务逻辑上）
 	 */
 	public static final int RESPONSE_FAIL =100;
 	
 	/**
-	 * �������û���
+	 * 用户名不存在
 	 */
 	public static final int RESPONSE_FAIL_USERNAME =101;
 	/**
-	 * �������
+	 * 密码错误
 	 */
 	public static final int RESPONSE_FAIL_PASSWORD =102;
 	/**
-	 * �����ڶ�Ӧ��վ
+	 * 尚未登录
+	 */
+	public static final int RESPONSE_FAIL_UNLOGIN = 103;
+	/**
+	 *登录网站错误
 	 */
 	public static final int RESPONSE_FAIL_WEBMESSAGE =103;
 	/**
-	 * �쳣
+	 * 发生未知异常
 	 */
 	public static final int RESPONSE_ERROR=300;
 	/**
-	 * û�е�¼
+	 * 没锟叫碉拷录
 	 */
-	public static final int RESPONSE_RELOGIN=400;
+	//public static final int RESPONSE_RELOGIN=400;
 	
-	private int status;// 200 成功   100  失败   300异常  400
+	private int status;// 200 鎴愬姛   100  澶辫触   300寮傚父  400
 	
 	private int status_;
 	
@@ -75,7 +79,7 @@ public class ResponseResult<T> implements Serializable{
 	}
 	
 	/**
-	 * 通过response返回json结果
+	 * 閫氳繃response杩斿洖json缁撴灉
 	 * @param response
 	 * @throws IOException
 	 */
@@ -162,30 +166,30 @@ public class ResponseResult<T> implements Serializable{
 	}
 	
 	/**
-	 * 重新登录提示的返回信�?
+	 * 重新登录提示的返回信息
 	 * @return
 	 */
 	public ResponseResult<T> relogin() {
-		return setValue(RESPONSE_RELOGIN, "登录已过�?, 请重新登�?", null);
+		return setValue(RESPONSE_FAIL_UNLOGIN, "登录已过期, 请重新登录", null);
 	}
 	
 	public ResponseResult<T> relogin(String message) {
-		return setValue(RESPONSE_RELOGIN,StringUtils.isEmpty(message) ? "登录已过�?, 请重新登�?" : message, null);
+		return setValue(RESPONSE_FAIL_UNLOGIN,StringUtils.isEmpty(message) ? "登录已过期, 请重新登录" : message, null);
 	}
 	
 	/**
-	 * 执行更新操作后返回前端的制式信息
+	 * 鎵ц鏇存柊鎿嶄綔鍚庤繑鍥炲墠绔殑鍒跺紡淇℃伅
 	 * @param result
 	 * @return
 	 */
 	public ResponseResult<T> updateResult(int result) {
 		switch (result) {
 		case 0:
-			return fail("更新失败，当前更新数�?0");
+			return fail("更新失败，当前更新数为0");
 		case 1:
 			return success();
 		default:
-			return error("更新失败，当前更新涉及多条数�?");
+			return error("更新失败，当前更新涉及多条数据?");
 		}
 	}
 	

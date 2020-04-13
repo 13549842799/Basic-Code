@@ -12,9 +12,11 @@ import com.cyz.basic.util.HttpUtil.RespParams;
 public class JsonResponseStrategy implements ResponseStrategy {
 
 	@Override
-	public void sendResponse(HttpServletRequest request, HttpServletResponse response, Object data) throws IOException {
-		
-		HttpUtil.responseResult(RespParams.create(request, response).success(data));
+	public void sendResponse(HttpServletRequest request, HttpServletResponse response, Object data) throws IOException {		
+		if (data == null) {
+			return;
+		}
+		HttpUtil.responseResult((RespParams)data);
 	}
 
 	@Override

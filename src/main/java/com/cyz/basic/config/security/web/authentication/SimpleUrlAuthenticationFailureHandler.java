@@ -9,7 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.cyz.basic.config.security.authentication.AbstractAuthenticationRestfulHandler;
 import com.cyz.basic.config.security.exception.AuthenticationException;
+//import com.cyz.basic.config.security.exception.AuthenticationServiceException;
+import com.cyz.basic.config.security.exception.BadCredentialsException;
+import com.cyz.basic.config.security.exception.UsernameNotFoundException;
+import com.cyz.basic.util.HttpUtil.RespParams;
 
 /**
  * <tt>AuthenticationFailureHandler</tt> which performs a redirect to the value of the
@@ -24,7 +29,7 @@ import com.cyz.basic.config.security.exception.AuthenticationException;
  * @author Luke Taylor
  * @since 3.0
  */
-public class SimpleUrlAuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class SimpleUrlAuthenticationFailureHandler extends AbstractAuthenticationRestfulHandler implements AuthenticationFailureHandler {
 	
 	protected final Log logger = LogFactory.getLog(getClass());
 	
@@ -32,10 +37,25 @@ public class SimpleUrlAuthenticationFailureHandler implements AuthenticationFail
 	}
 
 	@Override
-	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+	public void onAuthenticationFailure(HttpServletRequest req, HttpServletResponse resp,
 			AuthenticationException exception) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-
+		
+		if (exception instanceof UsernameNotFoundException) {
+			handle(req, resp, RespParams.create(req, resp).UsernameError());
+			return;
+		}
+		
+		if (exception instanceof BadCredentialsException) {
+			handle(req, resp, RespParams.create(req, resp).PasswordError());
+			return;
+		}
+		
+		/*if (exception instanceof AuthenticationServiceException) {
+			handle(req, resp, RespParams.create(req, resp).fail(exception.getMessage()));
+			return;
+		}*/
+		
+		handle(req, resp, RespParams.create(req, resp).fail(exception.getMessage()));
 	}
 
 }

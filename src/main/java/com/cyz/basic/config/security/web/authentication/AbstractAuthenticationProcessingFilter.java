@@ -97,6 +97,7 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 			if (authResult == null) {
 				return;
 			}
+			
 		} catch (InternalAuthenticationServiceException failed) {
 			logger.error(
 					"An internal error occurred while trying to authenticate the user.",
@@ -127,7 +128,16 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 	protected void unsuccessfulAuthentication(HttpServletRequest request,
 			HttpServletResponse response, AuthenticationException failed)
 			throws IOException, ServletException {
+		SecurityContextHolder.getContext().clearAuthentication();
+		if (logger.isDebugEnabled()) {
+			logger.debug("Authentication request failed: " + failed.toString(), failed);
+			logger.debug("Updated SecurityContextHolder to contain null Authentication");
+			logger.debug("Delegating to authentication failure handler " + failureHandler);
+		}
 		
+		//rememberMeServices.loginFail(request, response);
+		
+		failureHandler.onAuthenticationFailure(request, response, failed);
 	}
 	
 	public void setRememberMeServices(RememberMeServices rememberMeServices) {

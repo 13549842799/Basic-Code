@@ -1,6 +1,8 @@
 package com.cyz.basic.config.security.authentication;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.cyz.basic.config.security.detail.GrantedAuthority;
 
@@ -81,6 +83,20 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
 		}
 
 		super.setAuthenticated(false);
+	}
+
+	@Override
+	public Object result() {
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("username", this.principal);
+		result.put("details", this.getDetails());
+		return result;
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
 	}
 
 	@Override

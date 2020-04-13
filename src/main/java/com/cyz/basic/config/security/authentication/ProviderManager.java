@@ -239,13 +239,8 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 		}
 	}
 	
-	
-
-	public AuthenticationEventPublisher getEventPublisher() {
-		return eventPublisher;
-	}
-
-	public void setEventPublisher(AuthenticationEventPublisher eventPublisher) {
+	public void setAuthenticationEventPublisher(
+			AuthenticationEventPublisher eventPublisher) {
 		Assert.notNull(eventPublisher, "AuthenticationEventPublisher cannot be null");
 		this.eventPublisher = eventPublisher;
 	}

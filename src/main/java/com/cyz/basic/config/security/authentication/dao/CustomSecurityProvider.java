@@ -4,12 +4,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.util.Assert;
 
 import com.cyz.basic.config.security.authentication.AuthenticationProvider;
 import com.cyz.basic.config.security.authentication.UsernamePasswordAuthenticationToken;
 import com.cyz.basic.config.security.core.Authentication;
 import com.cyz.basic.config.security.core.userdetails.UserDetails;
-import com.cyz.basic.config.security.crypto.password.PasswordEncoder;
 import com.cyz.basic.config.security.detail.UserDetailsChecker;
 import com.cyz.basic.config.security.exception.AccountExpiredException;
 import com.cyz.basic.config.security.exception.AuthenticationException;
@@ -34,7 +34,8 @@ protected final Log logger = LogFactory.getLog(getClass());
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		
+		Assert.notNull(preAuthenticationChecks, "preAuthenticationChecks is null");
+		Assert.notNull(postAuthenticationChecks, "postAuthenticationChecks is null");
 	}
 	
 	protected void doAfterPropertiesSet() throws Exception {
@@ -49,7 +50,7 @@ protected final Log logger = LogFactory.getLog(getClass());
 		UserDetails user = detailsService.loadUserByUsername(username);
 		
 		if (user == null) {
-			throw new UsernameNotFoundException("");
+			throw new UsernameNotFoundException("用户名不存在");
 		}
 		
 		try {

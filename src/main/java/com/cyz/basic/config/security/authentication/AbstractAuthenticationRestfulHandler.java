@@ -10,9 +10,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 
-import com.cyz.basic.config.security.core.Authentication;
 import com.cyz.basic.config.security.web.JsonResponseStrategy;
 import com.cyz.basic.config.security.web.ResponseStrategy;
+import com.cyz.basic.util.HttpUtil.RespParams;
 
 public abstract class AbstractAuthenticationRestfulHandler {
 	
@@ -23,7 +23,7 @@ public abstract class AbstractAuthenticationRestfulHandler {
 	public AbstractAuthenticationRestfulHandler() {}
 	
 	protected void handle(HttpServletRequest request, HttpServletResponse response,
-			Authentication authentication) throws IOException, ServletException {		
+			RespParams authentication) throws IOException, ServletException {		
 		if (response.isCommitted()) {
 			logger.debug("Response has already been committed. Unable to send response");
 			return;

@@ -49,31 +49,6 @@ public class AuthenticationManagerBuilder extends
 		super(objectPostProcessor, true);
 	}
 	
-	@Override
-	protected AuthenticationManager performBuild() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	/**
-	 * Determines if the {@link AuthenticationManagerBuilder} is configured to build a non
-	 * null {@link AuthenticationManager}. This means that either a non-null parent is
-	 * specified or at least one {@link AuthenticationProvider} has been specified.
-	 *
-	 * <p>
-	 * When using {@link SecurityConfigurer} instances, the
-	 * {@link AuthenticationManagerBuilder} will not be configured until the
-	 * {@link SecurityConfigurer#configure(SecurityBuilder)} methods. This means a
-	 * {@link SecurityConfigurer} that is last could check this method and provide a
-	 * default configuration in the {@link SecurityConfigurer#configure(SecurityBuilder)}
-	 * method.
-	 *
-	 * @return
-	 */
-	public boolean isConfigured() {
-		return !authenticationProviders.isEmpty() || parentAuthenticationManager != null;
-	}
-	
 	/**
 	 * Allows providing a parent {@link AuthenticationManager} that will be tried if this
 	 * {@link AuthenticationManager} was unable to attempt to authenticate the provided
@@ -150,10 +125,72 @@ public class AuthenticationManagerBuilder extends
 		return null;
 	}*/
 	
+	
+	
+	
+	public <T extends UserDetailsService> DaoAuthenticationConfigurer<AuthenticationManagerBuilder, T> userDetailsService(
+			T userDetailsService) throws Exception {
+		this.defaultUserDetailsService = userDetailsService;
+		return apply(new DaoAuthenticationConfigurer<>(
+				userDetailsService));
+	}
+	
+	/**
+	 * Add authentication based upon the custom {@link AuthenticationProvider} that is
+	 * passed in. Since the {@link AuthenticationProvider} implementation is unknown, all
+	 * customizations must be done externally and the {@link AuthenticationManagerBuilder}
+	 * is returned immediately.
+	 *
+	 * <p>
+	 * This method <b>does NOT</b> ensure that the {@link UserDetailsService} is available
+	 * for the {@link #getDefaultUserDetailsService()} method.
+	 *
+	 * Note that an {@link Exception} might be thrown if an error occurs when adding the {@link AuthenticationProvider}.
+	 *
+	 * @return a {@link AuthenticationManagerBuilder} to allow further authentication to
+	 * be provided to the {@link AuthenticationManagerBuilder}
+	 */
 	@Override
 	public AuthenticationManagerBuilder authenticationProvider(AuthenticationProvider authenticationProvider) {
 		this.authenticationProviders.add(authenticationProvider);
 		return this;
+	}
+	
+	@Override
+	protected AuthenticationManager performBuild() throws Exception {
+		if (!isConfigured()) {
+			logger.debug("No authenticationProviders and no parentAuthenticationManager defined. Returning null.");
+			return null;
+		}
+		ProviderManager providerManager = new ProviderManager(authenticationProviders,
+				parentAuthenticationManager);
+		if (eraseCredentials != null) {
+			providerManager.setEraseCredentialsAfterAuthentication(eraseCredentials);
+		}
+		if (eventPublisher != null) {
+			providerManager.setAuthenticationEventPublisher(eventPublisher);
+		}
+		providerManager = postProcess(providerManager);
+		return providerManager;
+	}
+	
+	/**
+	 * Determines if the {@link AuthenticationManagerBuilder} is configured to build a non
+	 * null {@link AuthenticationManager}. This means that either a non-null parent is
+	 * specified or at least one {@link AuthenticationProvider} has been specified.
+	 *
+	 * <p>
+	 * When using {@link SecurityConfigurer} instances, the
+	 * {@link AuthenticationManagerBuilder} will not be configured until the
+	 * {@link SecurityConfigurer#configure(SecurityBuilder)} methods. This means a
+	 * {@link SecurityConfigurer} that is last could check this method and provide a
+	 * default configuration in the {@link SecurityConfigurer#configure(SecurityBuilder)}
+	 * method.
+	 *
+	 * @return
+	 */
+	public boolean isConfigured() {
+		return !authenticationProviders.isEmpty() || parentAuthenticationManager != null;
 	}
 	
 	/**
@@ -165,15 +202,6 @@ public class AuthenticationManagerBuilder extends
 	 */
 	public UserDetailsService getDefaultUserDetailsService() {
 		return this.defaultUserDetailsService;
-	}
-	
-	
-	public <T extends UserDetailsService> DaoAuthenticationConfigurer<AuthenticationManagerBuilder, T> userDetailsService(
-			T userDetailsService) throws Exception {
-		this.defaultUserDetailsService = userDetailsService;
-		/*return apply(new DaoAuthenticationConfigurer<>(
-				userDetailsService));*/
-		return null;
 	}
 	
 	/**
