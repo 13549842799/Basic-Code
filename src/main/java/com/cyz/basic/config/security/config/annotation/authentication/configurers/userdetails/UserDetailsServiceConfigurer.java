@@ -18,12 +18,27 @@ import com.cyz.basic.config.security.core.userdetails.UserDetailsService;
 public class UserDetailsServiceConfigurer<B extends ProviderManagerBuilder<B>, C extends UserDetailsServiceConfigurer<B, C, U>, U extends UserDetailsService>
 		extends AbstractDaoAuthenticationConfigurer<B, C, U> {
 
-	@Override
-	public U getUserDetailsService() {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Creates a new instance
+	 * @param userDetailsService the {@link UserDetailsService} that should be used
+	 */
+	public UserDetailsServiceConfigurer(U userDetailsService) {
+		super(userDetailsService);
 	}
 
+	@Override
+	public void configure(B builder) throws Exception {
+		initUserDetailsService();
+
+		super.configure(builder);
+	}
+
+	/**
+	 * Allows subclasses to initialize the {@link UserDetailsService}. For example, it
+	 * might add users, initialize schema, etc.
+	 */
+	protected void initUserDetailsService() throws Exception {
+	}
 	
 }
 

@@ -2,12 +2,15 @@ package com.cyz.basic.config.security.config.annotation.web.configurers;
 
 import java.util.LinkedHashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
 import com.cyz.basic.config.security.web.AuthenticationEntryPoint;
 import com.cyz.basic.config.security.web.access.AccessDeniedHandler;
 import com.cyz.basic.config.security.web.access.ExceptionTranslationFilter;
 import com.cyz.basic.config.security.web.authentication.DelegatingAuthenticationEntryPoint;
+import com.cyz.basic.config.security.web.authentication.Http403ForbiddenEntryPoint;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
 /**
@@ -44,6 +47,8 @@ import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
  */
 public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>> extends
     AbstractHttpConfigurer<ExceptionHandlingConfigurer<H>, H> {
+    
+    protected final Log logger = LogFactory.getLog(getClass());
 	
 	private AuthenticationEntryPoint authenticationEntryPoint;
 	

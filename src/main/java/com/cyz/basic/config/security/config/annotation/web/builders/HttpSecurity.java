@@ -213,14 +213,12 @@ public final class HttpSecurity extends
 							+ filterClass.getName()
 							+ " does not have a registered order and cannot be added without a specified order. Consider using addFilterBefore or addFilterAfter instead.");
 		}
-		System.out.println("进入添加filter");
 		this.filters.add(filter);
 		return this;
 	}
 
 	@Override
 	protected DefaultSecurityFilterChain performBuild() throws Exception {
-		System.out.println("filter:" + filters.size());
 		Collections.sort(filters, comparator);
 		return new DefaultSecurityFilterChain(requestMatcher, filters);
 	}

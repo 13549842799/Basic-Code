@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
 import com.cyz.basic.config.security.web.header.HeaderWriter;
 import com.cyz.basic.config.security.web.header.HeaderWriterFilter;
+import com.cyz.basic.config.security.web.header.writers.XContentTypeOptionsHeaderWriter;
 
 /**
  * <p>
@@ -40,12 +41,67 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>> extends Abstrac
 	
 	private List<HeaderWriter> headerWriters = new ArrayList<>();
 	
+	private final ContentTypeOptionsConfig contentTypeOptions = new ContentTypeOptionsConfig();
+	
 	/**
 	 * Creates a new instance
 	 *
 	 * @see HttpSecurity#headers()
 	 */
 	public HeadersConfigurer() {
+	}
+	
+	/**
+	 * Configures the {@link XContentTypeOptionsHeaderWriter} which inserts the <a href=
+	 * "https://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx"
+	 * >X-Content-Type-Options</a>:
+	 *
+	 * <pre>
+	 * X-Content-Type-Options: nosniff
+	 * </pre>
+	 *
+	 * @return the ContentTypeOptionsConfig for additional customizations
+	 */
+	public ContentTypeOptionsConfig contentTypeOptions() {
+		return contentTypeOptions.enable();
+	}
+
+	public final class ContentTypeOptionsConfig {
+		private XContentTypeOptionsHeaderWriter writer;
+
+		private ContentTypeOptionsConfig() {
+			enable();
+		}
+
+		/**
+		 * Removes the X-XSS-Protection header.
+		 *
+		 * @return {@link HeadersConfigurer} for additional customization.
+		 */
+		public HeadersConfigurer<H> disable() {
+			writer = null;
+			return and();
+		}
+
+		/**
+		 * Allows customizing the {@link HeadersConfigurer}
+		 * @return the {@link HeadersConfigurer} for additional customization
+		 */
+		public HeadersConfigurer<H> and() {
+			return HeadersConfigurer.this;
+		}
+
+		/**
+		 * Ensures that Content Type Options is enabled
+		 *
+		 * @return the {@link ContentTypeOptionsConfig} for additional customization
+		 */
+		private ContentTypeOptionsConfig enable() {
+			if (writer == null) {
+				writer = new XContentTypeOptionsHeaderWriter();
+			}
+			return this;
+		}
 	}
 	
 	/**
@@ -89,8 +145,8 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>> extends Abstrac
 	 */
 	private List<HeaderWriter> getHeaderWriters() {
 		List<HeaderWriter> writers = new ArrayList<>();
-		/*addIfNotNull(writers, contentTypeOptions.writer);
-		addIfNotNull(writers, xssProtection.writer);
+		addIfNotNull(writers, contentTypeOptions.writer);
+		/*addIfNotNull(writers, xssProtection.writer);
 		addIfNotNull(writers, cacheControl.writer);
 		addIfNotNull(writers, hsts.writer);
 		addIfNotNull(writers, frameOptions.writer);
@@ -107,5 +163,7 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>> extends Abstrac
 			values.add(value);
 		}
 	}
+	
+	
 
 }

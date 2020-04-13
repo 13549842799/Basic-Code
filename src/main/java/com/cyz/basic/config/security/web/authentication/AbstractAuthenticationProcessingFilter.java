@@ -97,7 +97,6 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 			if (authResult == null) {
 				return;
 			}
-			
 		} catch (InternalAuthenticationServiceException failed) {
 			logger.error(
 					"An internal error occurred while trying to authenticate the user.",
@@ -135,6 +134,7 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 			logger.debug("Delegating to authentication failure handler " + failureHandler);
 		}
 		
+		//暂时没有实现remember逻辑
 		//rememberMeServices.loginFail(request, response);
 		
 		failureHandler.onAuthenticationFailure(request, response, failed);
@@ -233,6 +233,18 @@ public abstract class AbstractAuthenticationProcessingFilter implements Applicat
 	public void setMessageSource(MessageSource messageSource) {
 		this.messages = new MessageSourceAccessor(messageSource);
 	}
+	
+	/**
+	 * Indicates if the filter chain should be continued prior to delegation to
+	 * {@link #successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
+	 * , which may be useful in certain environment (such as Tapestry applications).
+	 * Defaults to <code>false</code>.
+	 */
+	public void setContinueChainBeforeSuccessfulAuthentication(
+			boolean continueChainBeforeSuccessfulAuthentication) {
+		this.continueChainBeforeSuccessfulAuthentication = continueChainBeforeSuccessfulAuthentication;
+	}
+
 
 	@Override
 	public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {

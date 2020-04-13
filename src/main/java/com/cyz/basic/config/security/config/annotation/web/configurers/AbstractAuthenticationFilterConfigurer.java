@@ -1,7 +1,15 @@
 package com.cyz.basic.config.security.config.annotation.web.configurers;
 
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.MediaType;
+import org.springframework.util.Assert;
+import org.springframework.web.accept.ContentNegotiationStrategy;
+import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
 import com.cyz.basic.config.security.authentication.AuthenticationDetailsSource;
 import com.cyz.basic.config.security.authentication.AuthenticationManager;
@@ -10,7 +18,13 @@ import com.cyz.basic.config.security.authentication.SimpleAuthenticationSuccessH
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
 import com.cyz.basic.config.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import com.cyz.basic.config.security.web.authentication.AuthenticationFailureHandler;
+import com.cyz.basic.config.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import com.cyz.basic.config.security.web.authentication.RememberMeServices;
+import com.cyz.basic.config.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import com.cyz.basic.config.security.web.util.matcher.AndRequestMatcher;
+import com.cyz.basic.config.security.web.util.matcher.MediaTypeRequestMatcher;
+import com.cyz.basic.config.security.web.util.matcher.NegatedRequestMatcher;
+import com.cyz.basic.config.security.web.util.matcher.RequestHeaderRequestMatcher;
 import com.cyz.basic.config.security.web.util.matcher.RequestMatcher;
 
 public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecurityBuilder<B>, T extends AbstractAuthenticationFilterConfigurer<B, T, F>, F extends AbstractAuthenticationProcessingFilter> 
@@ -19,23 +33,26 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	private F authFilter;
 	private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource;
 	private boolean enableLoginPage; //是否启用登录页
-	private String loginPage;
+	//private String loginPage;
 	private String loginProcessingUrl;
 	
 	private SimpleAuthenticationSuccessHandler defaultSuccessHandler = new SimpleAuthenticationSuccessHandler();
 	private AuthenticationSuccessHandler successHandler = this.defaultSuccessHandler;
 	
 	private AuthenticationFailureHandler failureHandler;
+	private LoginUrlAuthenticationEntryPoint authenticationEntryPoint;
 	
 	private boolean permitAll;
 
-	private String failureUrl;
+	//private String failureUrl;
 	
 	/**
 	 * Creates a new instance with minimal defaults
 	 */
 	protected AbstractAuthenticationFilterConfigurer() {
 		this.enableLoginPage = false;
+		this.loginProcessingUrl = "/login";
+		this.authenticationEntryPoint = new LoginUrlAuthenticationEntryPoint();
 	}
 	
 	/**
@@ -141,6 +158,57 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 		return getSelf();
 	}
 	
+	
+	/**
+	 * Specifies the {@link AuthenticationFailureHandler} to use when authentication
+	 * fails. The default is redirecting to "/login?error" using
+	 * {@link SimpleUrlAuthenticationFailureHandler}
+	 *
+	 * @param authenticationFailureHandler the {@link AuthenticationFailureHandler} to use
+	 * when authentication fails.
+	 * @return the {@link FormLoginConfigurer} for additional customization
+	 */
+	public final T failureHandler(
+			AuthenticationFailureHandler authenticationFailureHandler) {
+		//this.failureUrl = null;
+		this.failureHandler = authenticationFailureHandler;
+		return getSelf();
+	}
+	
+	@Override
+	public void init(B http) throws Exception {
+		updateAuthenticationDefaults();
+		updateAccessDefaults(http);
+		registerDefaultAuthenticationEntryPoint(http);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void registerDefaultAuthenticationEntryPoint(B http) {
+		ExceptionHandlingConfigurer<B> exceptionHandling = http
+				.getConfigurer(ExceptionHandlingConfigurer.class);
+		if (exceptionHandling == null) {
+			return;
+		}
+		ContentNegotiationStrategy contentNegotiationStrategy = http
+				.getSharedObject(ContentNegotiationStrategy.class);
+		if (contentNegotiationStrategy == null) {
+			contentNegotiationStrategy = new HeaderContentNegotiationStrategy();
+		}
+
+		MediaTypeRequestMatcher mediaMatcher = new MediaTypeRequestMatcher(
+				contentNegotiationStrategy, MediaType.APPLICATION_XHTML_XML,
+				new MediaType("image", "*"), MediaType.TEXT_HTML, MediaType.TEXT_PLAIN);
+		mediaMatcher.setIgnoredMediaTypes(Collections.singleton(MediaType.ALL));
+
+		RequestMatcher notXRequestedWith = new NegatedRequestMatcher(
+				new RequestHeaderRequestMatcher("X-Requested-With", "XMLHttpRequest"));
+
+		RequestMatcher preferredMatcher = new AndRequestMatcher(Arrays.asList(notXRequestedWith, mediaMatcher));
+
+		exceptionHandling.defaultAuthenticationEntryPointFor(
+				postProcess(authenticationEntryPoint), preferredMatcher);
+	}
+	
 	@Override
 	public void configure(B http) throws Exception {
 
@@ -184,13 +252,46 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	}
 	
 	/**
+	 * Gets the URL to submit an authentication request to (i.e. where username/password
+	 * must be submitted)
+	 *
+	 * @return the URL to submit an authentication request to
+	 */
+	protected final String getLoginProcessingUrl() {
+		return loginProcessingUrl;
+	}
+	
+	/**
+	 * Updates the default values for authentication.
+	 *
+	 * @throws Exception
+	 */
+	//@SuppressWarnings("unchecked")
+	private void updateAuthenticationDefaults() {
+		Assert.notNull(loginProcessingUrl, "loginProcessingUrl must is not null");
+		loginProcessingUrl(loginProcessingUrl);
+
+		
+		if (failureHandler == null) {
+			failureHandler(new SimpleUrlAuthenticationFailureHandler());
+		}
+		/*final LogoutConfigurer<B> logoutConfigurer = getBuilder().getConfigurer(
+				LogoutConfigurer.class);
+		if (logoutConfigurer != null && !logoutConfigurer.isCustomLogoutSuccess()) {
+			logoutConfigurer.logoutSuccessUrl(loginPage + "?logout");
+		}*/
+	}
+	
+	/**
 	 * Updates the default values for access.
 	 */
 	protected final void updateAccessDefaults(B http) {
 		if (permitAll) {
-			PermitAllSupport.permitAll(http, loginPage, loginProcessingUrl, failureUrl);
+			PermitAllSupport.permitAll(http, loginProcessingUrl);
 		}
 	}
+	
+
 	
 	@SuppressWarnings("unchecked")
 	private T getSelf() {

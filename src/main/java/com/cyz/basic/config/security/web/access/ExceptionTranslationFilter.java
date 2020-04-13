@@ -67,6 +67,8 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 	
 	private final MessageSourceAccessor messages = null;
 	
+	public ExceptionTranslationFilter() {}
+	
 	public ExceptionTranslationFilter(AuthenticationEntryPoint authenticationEntryPoint) {
 		Assert.notNull(authenticationEntryPoint,
 				"authenticationEntryPoint cannot be null");
