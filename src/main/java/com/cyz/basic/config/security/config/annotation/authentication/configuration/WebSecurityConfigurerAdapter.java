@@ -15,6 +15,7 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
+import com.cyz.basic.config.security.SecurityProperties;
 import com.cyz.basic.config.security.authentication.AuthenticationManager;
 import com.cyz.basic.config.security.authentication.AuthenticationTrustResolver;
 import com.cyz.basic.config.security.authentication.AuthenticationTrustResolverImpl;
@@ -128,8 +129,11 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 		
 		http = new HttpSecurity(objectPostProcessor, authenticationBuilder, sharedObjects);
 		if (!disableDefaults) {
+			
+			SecurityProperties p = context.getBean(SecurityProperties.class);
+			
 			http
-			.addFilterBefore( new AuthenticationTokenFilter(), FilterSecurityInterceptor.class)
+			.addFilterBefore( new AuthenticationTokenFilter(p.getHeader().getToken()), FilterSecurityInterceptor.class)
 			.exceptionHandling().and()
 			.headers().and()
 			.anonymous().and()

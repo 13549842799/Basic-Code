@@ -27,12 +27,15 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
 	 * 
 	 */
 	private static final long serialVersionUID = 154844373771184373L;
-	private final Object principal; //一般表示用户名
+	private Object principal; //一般表示用户名
 	private Object credentials; //一般表示密码
 
 	// ~ Constructors
 	// ===================================================================================================
 
+	public UsernamePasswordAuthenticationToken() {
+	}
+	
 	/**
 	 * This constructor can be safely used by any code that wishes to create a
 	 * <code>UsernamePasswordAuthenticationToken</code>, as the {@link #isAuthenticated()}
@@ -77,12 +80,12 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
 	
 
 	public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-		if (isAuthenticated) {
+		/*if (isAuthenticated) {
 			throw new IllegalArgumentException(
 					"Cannot set this token to trusted - use constructor which takes a GrantedAuthority list instead");
-		}
+		}*/
 
-		super.setAuthenticated(false);
+		super.setAuthenticated(isAuthenticated);
 	}
 
 	@Override

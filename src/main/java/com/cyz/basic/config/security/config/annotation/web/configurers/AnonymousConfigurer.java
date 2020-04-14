@@ -16,7 +16,7 @@ public class AnonymousConfigurer<H extends HttpSecurityBuilder<H>> extends Abstr
 	private String key;
 	private AuthenticationProvider authenticationProvider;
 	private AnonymousAuthenticationFilter authenticationFilter;
-	private Object principal = EntityConstants.ANONYMOUS;
+	private Object principal = EntityConstants.SESSION.ANONYMOUS;
 	private List<GrantedAuthority> authorities = AuthorityUtils
 			.createAuthorityList("ROLE_ANONYMOUS");
 	

@@ -50,6 +50,8 @@ public class SecurityProperties implements SecurityPrerequisite {
 
 	private final Filter filter = new Filter();
 	
+	private Header header = new Header();
+	
 	public Filter getFilter() {
 		return this.filter;
 	}
@@ -85,6 +87,30 @@ public class SecurityProperties implements SecurityPrerequisite {
 
 	}
 	
+	public static class Header {
+		private String user;
+		
+		private String token;
+
+		public String getUser() {
+			return user;
+		}
+
+		public void setUser(String user) {
+			this.user = user;
+		}
+
+		public String getToken() {
+			return token;
+		}
+
+		public void setToken(String token) {
+			this.token = token;
+		}
+	
+	}
+	
+	
 
 	public String getLoginPage() {
 		return loginPage;
@@ -116,6 +142,14 @@ public class SecurityProperties implements SecurityPrerequisite {
 
 	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;
+	}
+
+	public Header getHeader() {
+		return header;
+	}
+
+	public void setHeader(Header header) {
+		this.header = header;
 	}
 	
 	

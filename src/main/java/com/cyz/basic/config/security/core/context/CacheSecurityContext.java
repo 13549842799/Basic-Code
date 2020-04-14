@@ -74,8 +74,8 @@ public class CacheSecurityContext implements SecurityContext {
 	private String createAuthenticationKey(Object username) {
 		
 		HttpServletRequest request = SpringMvcHolder.getRequest();
-		String key = request.getHeader("x-user");
-		if (username != null && !username.equals(EntityConstants.ANONYMOUS)) { //如果存在用户名并且用户名不是属于匿名用户的
+		String key = request.getHeader(properties.getHeader().getUser());
+		if (username != null && !username.equals(EntityConstants.SESSION.ANONYMOUS)) { //如果存在用户名并且用户名不是属于匿名用户的
 			key = String.valueOf(username);
 		}
 		key = !StringUtils.isEmpty(key) ? EntityConstants.tokenKey(HttpUtil.isPhoneLogin(request) ? EntityConstants.ORIGIN_PHONE : EntityConstants.ORIGIN_COMP, key) 

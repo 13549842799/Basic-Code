@@ -22,6 +22,8 @@ public abstract class AbstractAuthenticationToken implements Authentication
 
 	// ~ Constructors
 	// ===================================================================================================
+	
+	public AbstractAuthenticationToken() {}
 
 	/**
 	 * Creates a token with the supplied array of authorities.
@@ -44,7 +46,8 @@ public abstract class AbstractAuthenticationToken implements Authentication
 		ArrayList<GrantedAuthority> temp = new ArrayList<>(
 				authorities.size());
 		temp.addAll(authorities);
-		this.authorities = Collections.unmodifiableList(temp);
+		//this.authorities = Collections.unmodifiableList(temp);
+		this.authorities = temp;
 	}
 
 	// ~ Methods
@@ -52,6 +55,10 @@ public abstract class AbstractAuthenticationToken implements Authentication
 
 	public Collection<GrantedAuthority> getAuthorities() {
 		return authorities;
+	}
+	
+	public void setAuthorities(Collection<GrantedAuthority> authorities)  {
+		this.authorities = authorities;
 	}
 
 	public String getName() {
