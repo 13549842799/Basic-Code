@@ -180,6 +180,7 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 		List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
 		MyAuthenticatedVoter voter = new MyAuthenticatedVoter();
 		decisionVoters.add(voter);
+		
 		/*WebExpressionVoter expressionVoter = new WebExpressionVoter();
 		expressionVoter.setExpressionHandler(getExpressionHandler(http));*/
 		//decisionVoters.add(expressionVoter);

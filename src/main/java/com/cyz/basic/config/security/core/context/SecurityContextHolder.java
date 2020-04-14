@@ -7,9 +7,9 @@ import com.cyz.basic.config.security.SecurityProperties;
 
 public class SecurityContextHolder {
 	
-	private static CyzSecurityContext context = null;
+	private static SecurityContext context = null;
 	
-	public static CyzSecurityContext getContext() {
+	public static SecurityContext getContext() {
 		return context;
 	}
 	

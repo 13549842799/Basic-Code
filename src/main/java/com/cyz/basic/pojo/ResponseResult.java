@@ -42,7 +42,11 @@ public class ResponseResult<T> implements Serializable{
 	/**
 	 *登录网站错误
 	 */
-	public static final int RESPONSE_FAIL_WEBMESSAGE =103;
+	public static final int RESPONSE_FAIL_WEBMESSAGE =104;
+	/**
+	 *token校验错误
+	 */
+	public static final int RESPONSE_FAIL_Token =105;
 	/**
 	 * 发生未知异常
 	 */

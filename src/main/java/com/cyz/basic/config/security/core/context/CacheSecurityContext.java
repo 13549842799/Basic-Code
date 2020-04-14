@@ -5,15 +5,15 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import com.cyz.basic.config.RedisConfig;
 import com.cyz.basic.config.security.SecurityProperties;
 import com.cyz.basic.config.security.core.Authentication;
+import com.cyz.basic.constant.EntityConstants;
+import com.cyz.basic.util.HttpUtil;
 import com.cyz.basic.web.SpringMvcHolder;
 
-public class CacheSecurityContext implements CyzSecurityContext {
+public class CacheSecurityContext implements SecurityContext {
 	
 	private final RedisTemplate<String, Object> redisTemplate;
 	
@@ -47,7 +47,7 @@ public class CacheSecurityContext implements CyzSecurityContext {
 		if (authentication == null) {
 			throw new IllegalArgumentException("authentication can be null when save it");
 		}
-		String key = createAuthenticationKey();
+		String key = createAuthenticationKey(authentication.getPrincipal());
 		if (redisTemplate.hasKey(key)) {
 			redisTemplate.opsForValue().set(key, authentication);
 			return;
@@ -59,22 +59,28 @@ public class CacheSecurityContext implements CyzSecurityContext {
 		String key = createAuthenticationKey();
 		if (redisTemplate.hasKey(key)) {
 			redisTemplate.delete(key);
+			System.out.println("移除authentication");
 		}
+	}
+	
+    private String createAuthenticationKey() {	
+		return createAuthenticationKey(null);
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	private String createAuthenticationKey() {
+	private String createAuthenticationKey(Object username) {
 		
-		HttpServletRequest reqeust = SpringMvcHolder.getRequest();
-		
-		String token = reqeust.getHeader("x-token");
-         
-	    token = token != null ? token : "session_" + reqeust.getRequestedSessionId();
-		
-		return token;
+		HttpServletRequest request = SpringMvcHolder.getRequest();
+		String key = request.getHeader("x-user");
+		if (username != null && !username.equals(EntityConstants.ANONYMOUS)) { //如果存在用户名并且用户名不是属于匿名用户的
+			key = String.valueOf(username);
+		}
+		key = !StringUtils.isEmpty(key) ? EntityConstants.tokenKey(HttpUtil.isPhoneLogin(request) ? EntityConstants.ORIGIN_PHONE : EntityConstants.ORIGIN_COMP, key) 
+				: "session_" + request.getRequestedSessionId();	
+		return key;
 	}
 
 	public SecurityProperties getProperties() {

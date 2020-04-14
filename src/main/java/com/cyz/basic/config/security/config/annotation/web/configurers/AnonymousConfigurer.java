@@ -9,13 +9,14 @@ import com.cyz.basic.config.security.authority.AuthorityUtils;
 import com.cyz.basic.config.security.config.annotation.web.HttpSecurityBuilder;
 import com.cyz.basic.config.security.detail.GrantedAuthority;
 import com.cyz.basic.config.security.web.authentication.AnonymousAuthenticationFilter;
+import com.cyz.basic.constant.EntityConstants;
 
 public class AnonymousConfigurer<H extends HttpSecurityBuilder<H>> extends AbstractHttpConfigurer<AnonymousConfigurer<H>, H> {
 	
 	private String key;
 	private AuthenticationProvider authenticationProvider;
 	private AnonymousAuthenticationFilter authenticationFilter;
-	private Object principal = "anonymousUser";
+	private Object principal = EntityConstants.ANONYMOUS;
 	private List<GrantedAuthority> authorities = AuthorityUtils
 			.createAuthorityList("ROLE_ANONYMOUS");
 	

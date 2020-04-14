@@ -28,9 +28,44 @@ import com.cyz.basic.pojo.ResponseResult;
  */
 public abstract class HttpUtil {
 	
+	private final static String[] agent = { "Android", "iPhone", "iPod","iPad", "Windows Phone", "MQQBrowser" }; //定义移动端请求的所有可能类型
+	
 	private static final String JSON_TYPE = "application/json;charset=UTF-8";
 
 	private static final String TEXT_TYPE = "text/plain";
+	
+	/**
+	 * 判断请求来源
+	 * @param request
+	 * @return  0-手机 1-其它
+	 */
+	public static int checkHttpOrigin(HttpServletRequest request) {
+		
+		String ua = request.getHeader("User-Agent");
+		
+		if (ua.contains("Windows NT") && (!ua.contains("Windows NT") || !ua.contains("compatible; MSIE 9.0;"))) {
+			return 1;
+		}
+		// 排除 苹果桌面系统
+		if (ua.contains("Windows NT") || ua.contains("Macintosh")) {
+			return 1;
+		}
+		for (String item : agent) {
+			if (ua.contains(item)) {
+				return 0;
+			}
+		}
+		return 1;
+	}
+	
+	/**
+	 * 判断是否属于手机端
+	 * @param request
+	 * @return
+	 */
+	public static boolean isPhoneLogin(HttpServletRequest request) {
+		return checkHttpOrigin(request) == 0;
+	}
 	
 	public static Map<String, Object> request(String url, Map<String, String> params, Map<String, String> headers, String type, String responseType) {
 		switch (type) {
@@ -312,8 +347,13 @@ public abstract class HttpUtil {
     		return fail("密码错误", ResponseResult.RESPONSE_FAIL_PASSWORD);
     	}
     	
+    	public RespParams WebMessageError() {
+    		return fail("不存在登录网站", ResponseResult.RESPONSE_FAIL_WEBMESSAGE);
+    	}
     	
-    	
+    	public RespParams tokenError() {
+    		return fail("token不正确", ResponseResult.RESPONSE_FAIL_Token);
+    	}
 
 		public HttpServletRequest getReq() {
 			return req;

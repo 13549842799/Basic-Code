@@ -9,7 +9,7 @@ import com.cyz.basic.config.security.core.Authentication;
  * @author cyz
  *
  */
-public interface CyzSecurityContext extends Serializable {
+public interface SecurityContext extends Serializable {
 	/**
 	 * Obtains the currently authenticated principal, or an authentication request token.
 	 *

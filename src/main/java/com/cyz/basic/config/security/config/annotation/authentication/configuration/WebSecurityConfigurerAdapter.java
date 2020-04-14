@@ -21,6 +21,7 @@ import com.cyz.basic.config.security.authentication.AuthenticationTrustResolverI
 import com.cyz.basic.config.security.authentication.DefaultAuthenticationEventPublisher;
 import com.cyz.basic.config.security.config.annotation.ObjectPostProcessor;
 import com.cyz.basic.config.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import com.cyz.basic.config.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer;
 import com.cyz.basic.config.security.config.annotation.web.WebSecurityConfigurer;
 import com.cyz.basic.config.security.config.annotation.web.builders.HttpSecurity;
 import com.cyz.basic.config.security.config.annotation.web.builders.WebSecurity;
@@ -29,6 +30,7 @@ import com.cyz.basic.config.security.core.userdetails.UserDetailsService;
 import com.cyz.basic.config.security.crypto.factory.PasswordEncoderFactories;
 import com.cyz.basic.config.security.crypto.password.PasswordEncoder;
 import com.cyz.basic.config.security.exception.UsernameNotFoundException;
+import com.cyz.basic.config.security.filter.AuthenticationTokenFilter;
 import com.cyz.basic.config.security.web.access.intercept.FilterSecurityInterceptor;
 
 
@@ -127,11 +129,13 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 		http = new HttpSecurity(objectPostProcessor, authenticationBuilder, sharedObjects);
 		if (!disableDefaults) {
 			http
+			.addFilterBefore( new AuthenticationTokenFilter(), FilterSecurityInterceptor.class)
 			.exceptionHandling().and()
 			.headers().and()
 			.anonymous().and()
 			.logout();
 		}
+		
 		configure(http);
 		return http;
 	}
@@ -315,15 +319,16 @@ public abstract class WebSecurityConfigurerAdapter implements WebSecurityConfigu
 		DefaultPasswordEncoderAuthenticationManagerBuilder(
 			ObjectPostProcessor<Object> objectPostProcessor, PasswordEncoder defaultPasswordEncoder) {
 			super(objectPostProcessor);
+			
 			this.defaultPasswordEncoder = defaultPasswordEncoder;
 		}
 
-		/*@Override
+		@Override
 		public <T extends UserDetailsService> DaoAuthenticationConfigurer<AuthenticationManagerBuilder, T> userDetailsService(
 			T userDetailsService) throws Exception {
 			return super.userDetailsService(userDetailsService)
 				.passwordEncoder(this.defaultPasswordEncoder);
-		}*/
+		}
 	}
 	
 	/**

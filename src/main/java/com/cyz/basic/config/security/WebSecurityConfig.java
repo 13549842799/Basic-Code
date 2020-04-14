@@ -21,7 +21,21 @@ public abstract class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().anyRequest().authenticated()
 		.and().formLogin().loginProcessingUrl(properties.getLoginUrl()).permitAll();//登录行为任意访问     
 		http.logout().clearAuthentication(true).logoutUrl(properties.getLogoutUrl()); //只允许已登录的访问
+		uniqueConfigure(http);
 	}
+	
+	/**
+	 * you can overwrite the mathed to make your unique config
+	 * @param http
+	 */
+	protected void uniqueConfigure(HttpSecurity http) {
+		
+	}
+
+	public SecurityProperties getProperties() {
+		return properties;
+	}
+	
 	
 
 }

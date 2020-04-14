@@ -74,6 +74,7 @@ public class DefaultAuthenticationEventPublisher implements AuthenticationEventP
 
 	@Override
 	public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
+		System.out.println(exception.getClass().getName());
 		Constructor<? extends AbstractAuthenticationEvent> constructor = exceptionMappings
 				.get(exception.getClass().getName());
 		AbstractAuthenticationEvent event = null;
