@@ -2,6 +2,8 @@ package com.cyz.basic.service.impl;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -25,7 +27,7 @@ import com.cyz.basic.service.support.BasicServiceSupport;
 public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T> implements BasicService<T> {
 
 	@Autowired
-	protected BasicMapper<T> basicMapper;
+	private BasicMapper<T> basicMapper;
 	
 	public abstract T newEntity();
 	

@@ -10,6 +10,8 @@ import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.context.request.RequestContextListener;
 
+import com.cyz.basic.valid.service.ValidService;
+
 @Configuration
 public class SpringConfiguration {
 	
@@ -33,6 +35,11 @@ public class SpringConfiguration {
         source.setUseCodeAsDefaultMessage(true);
         source.setDefaultEncoding("UTF-8");
 		SpringMessageSource.setMessageSource(new MessageSourceAccessor(source));
+	}
+	
+	@Bean
+	public ValidService validService() {
+		return new ValidService();
 	}
 	
 	public static class SpringMessageSource {

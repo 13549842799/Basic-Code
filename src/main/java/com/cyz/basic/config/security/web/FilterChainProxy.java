@@ -130,6 +130,10 @@ public class FilterChainProxy extends GenericFilterBean{
 	
 	private HttpFirewall firewall = new StrictHttpFirewall();
 	
+	@Override
+	public void afterPropertiesSet() {
+		filterChainValidator.validate(this);
+	}
 	
 	@Override
 	public void destroy() {
@@ -144,7 +148,7 @@ public class FilterChainProxy extends GenericFilterBean{
 	}
 
 	public FilterChainProxy(List<SecurityFilterChain> filterChains) {
-		this.filterChains = filterChains;
+		this.filterChains = filterChains;		
 	}
  
 	@Override
@@ -224,7 +228,16 @@ public class FilterChainProxy extends GenericFilterBean{
 		this.filterChains = filterChains;
 	}
 
-
+	/**
+	 * Used (internally) to specify a validation strategy for the filters in each
+	 * configured chain.
+	 *
+	 * @param filterChainValidator the validator instance which will be invoked on during
+	 * initialization to check the {@code FilterChainProxy} instance.
+	 */
+	public void setFilterChainValidator(FilterChainValidator filterChainValidator) {
+		this.filterChainValidator = filterChainValidator;
+	}
 
 	private static class VirtualFilterChain implements FilterChain {
 		private final FilterChain originalChain;
