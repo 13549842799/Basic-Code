@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.Assert;
 
 import com.cyz.basic.Exception.AddErrorException;
 import com.cyz.basic.Exception.AddErrorException.ErrorType;
@@ -24,17 +25,9 @@ import com.cyz.basic.service.support.BasicServiceSupport;
  *
  * @param <T>
  */
-public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T> implements BasicService<T> {
-
-	@Autowired
-	private BasicMapper<T> basicMapper;
+public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T> /*implements BasicService<T> */{
 	
 	public abstract T newEntity();
-	
-	public T get(T t) {
-		fullDeleteSign(t);
-		return basicMapper.get(t);
-	}
 	
 	/**
 	 * 
@@ -42,13 +35,11 @@ public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T>
 	 * @return
 	 * @throws Exception
 	 */
-	public T getById(long id) throws Exception{
+	public T getById(long id) {
 		T t = this.newEntity(); 
-		if (t instanceof IdEntity) {
-			((IdEntity<?>)t).acceptId(id);			
-			return this.get(t);
-		}		
-		throw new Exception("when you use this method， you have to extend the IdEntity");
+		Assert.isAssignable(IdEntity.class, t.getClass(), "when you use this method， you have to extend the IdEntity");
+		((IdEntity<?>)t).acceptId(id);			
+		return this.get(t);	
 	}
 	
 	/**
@@ -61,66 +52,5 @@ public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T>
 		return basicMapper.getList(t);
 	}
 	
-	public void add(T t) throws AddErrorException {
-		fullDeleteSign(t);
-	    try {
-		  	int count = basicMapper.add(t);
-		  	if (count == 0) {
-		  		throw new AddErrorException(ErrorType.OBJECT_NOT_ALL);
-		  	}
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new AddErrorException(ErrorType.OBJECT_FUNCTION_ERROR);
-		}
-	}
 	
-	@Transactional
-	public int update(T t) {
-		fullDeleteSign(t);
-		int count = basicMapper.update(t);
-		if (count == 0 || count == 1) {
-			return count;
-		}
-		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-		return -1;
-	}
-	
-	@Transactional
-	public int updateFull(T t) {
-		fullDeleteSign(t);
-		int count = basicMapper.updateFull(t);
-		if (count == 0 || count == 1) {
-			return count;
-		}
-		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-		return -1;
-	}
-	
-	public boolean delete(T t) {
-		fullDelSign(t);
-		return basicMapper.delete(t) == 1;
-	}
-	
-	/**
-	 * 为对象填充delflag = 1
-	 * @param t
-	 */
-	private void fullDeleteSign (T t) {
-		fullDeleteSign(t, DeleteFlag.VALID.getCode()); 
-	}
-	
-	/**
-	 * 为对象填充delflag = 0
-	 * @param t
-	 */
-	private void fullDelSign(T t) {
-		fullDeleteSign(t, DeleteFlag.DELETE.getCode()); 
-	}
-	
-	@SuppressWarnings("rawtypes")
-	private void fullDeleteSign(T t, byte delflag) {
-		if (t instanceof DeleteAbleEntity) {
-			((DeleteAbleEntity)t).setDelflag(delflag);
-		}
-	}
 }

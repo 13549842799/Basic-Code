@@ -14,7 +14,6 @@ public class MyAuthenticatedVoter extends AuthenticatedVoter {
 		int result = ACCESS_ABSTAIN;
 		
 		Collection<? extends GrantedAuthority> auths = authentication.getAuthorities();
-        System.out.println(auths == null ? "auths长度为0" : "auths的长度为:" + auths.size());
 		if (auths == null || auths.size() == 0) {
 			return ACCESS_DENIED;
 		}
@@ -23,8 +22,6 @@ public class MyAuthenticatedVoter extends AuthenticatedVoter {
 			/*if (!super.supports(attr)) {
 				continue;
 			}*/			
-			System.out.println("支持");
-			System.out.println(attr.getAttribute());
 			for (GrantedAuthority auth : auths) {
 				if (auth.getAuthority().equals(attr.getAttribute())) {
 					return ACCESS_GRANTED;
