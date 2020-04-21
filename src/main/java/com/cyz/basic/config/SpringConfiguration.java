@@ -1,6 +1,8 @@
 package com.cyz.basic.config;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -12,6 +14,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.context.request.RequestContextListener;
 
 import com.cyz.basic.valid.service.ValidService;
+import com.cyz.basic.web.CorsFilter;
 
 @Configuration
 public class SpringConfiguration {
@@ -28,19 +31,21 @@ public class SpringConfiguration {
 		return srb;
 	}
 	
-	/*@Bean
+	@Bean
     public FilterRegistrationBean<CorsFilter> corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        //UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        //CorsConfiguration config = new CorsConfiguration();
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("allowOrigin", "http://localhost:8084");
+        params.put("allowMethods", "GET,POST,PUT,DELETE,OPTIONS,PATCH");
+        params.put("allowCredentials", "true");
+        params.put("allowHeaders", "Content-Type,X-user,X-token");
+        CorsFilter filter = new CorsFilter(params);
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(filter);
+        bean.addUrlPatterns("/*");
         bean.setOrder(0);
         return bean;
-    }*/
+    }
 	
 	
 	/*@Bean
