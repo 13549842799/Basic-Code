@@ -272,7 +272,7 @@ public abstract class HttpUtil {
     	result.setMessage(params.getErrorMessage());
     	result.setData(params.getContent());
     
-		resp.getWriter().write(JSONObject.toJSONString(result));
+		resp.getWriter().print(JSONObject.toJSON(result));
 		resp.getWriter().flush();
 
     }

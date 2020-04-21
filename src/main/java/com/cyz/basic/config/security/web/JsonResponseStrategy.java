@@ -16,6 +16,7 @@ public class JsonResponseStrategy implements ResponseStrategy {
 		if (data == null) {
 			return;
 		}
+		System.out.println("进入这里");
 		HttpUtil.responseResult((RespParams)data);
 	}
 

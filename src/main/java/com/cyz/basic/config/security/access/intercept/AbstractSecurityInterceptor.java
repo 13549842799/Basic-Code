@@ -24,6 +24,7 @@ import com.cyz.basic.config.security.core.Authentication;
 import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 import com.cyz.basic.config.security.exception.AccessDeniedException;
 import com.cyz.basic.config.security.exception.AuthenticationCredentialsNotFoundException;
+import com.cyz.basic.web.SpringMvcHolder;
 
 
 public abstract class AbstractSecurityInterceptor implements InitializingBean, ApplicationEventPublisherAware, MessageSourceAware{
@@ -75,7 +76,9 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean, A
 				logger.debug("Public object - authentication not attempted");
 			}
 
-			publishEvent(new PublicInvocationEvent(object));
+			//因为如果找不到路径的话会出问题
+			SpringMvcHolder.getRequest().setAttribute("NoMapperAttr", Boolean.TRUE);
+			//publishEvent(new PublicInvocationEvent(object));
 
 			//return null; // no further work post-invocation
 			return;

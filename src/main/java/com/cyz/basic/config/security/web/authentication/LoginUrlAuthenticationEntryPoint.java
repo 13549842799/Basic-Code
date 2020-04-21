@@ -73,6 +73,7 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 		logger.info("判断登录问题类型,返回json");
 		if (authException instanceof InsufficientAuthenticationException) {
 			strategy.sendResponse(request, response, RespParams.create(request, response).ReLogin());
+			logger.info("InsufficientAuthenticationException");
 			return;
 		}
 		strategy.sendResponse(request, response, RespParams.create(request, response).fail(authException.getMessage()));

@@ -193,7 +193,12 @@ public class FilterChainProxy extends GenericFilterBean{
 
 			return;
 		}
-
+		Object attr = fwRequest.getAttribute("NoMapperAttr");
+		if (attr != null || fwRequest.getMethod().equals("OPTIONS")) {
+			chain.doFilter(fwRequest, fwResponse);
+			return;
+		}
+	
 		VirtualFilterChain vfc = new VirtualFilterChain(fwRequest, chain, filters);
 		vfc.doFilter(fwRequest, fwResponse);
 	}
