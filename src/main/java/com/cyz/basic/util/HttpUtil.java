@@ -271,10 +271,10 @@ public abstract class HttpUtil {
     	result.setStatus(params.getCode());
     	result.setMessage(params.getErrorMessage());
     	result.setData(params.getContent());
-    
+        resp.addHeader("Access-Control-Allow-Origin", params.getReq().getHeader("Origin"));
 		resp.getWriter().print(JSONObject.toJSON(result));
 		resp.getWriter().flush();
-
+        
     }
     
     public static class RespParams {

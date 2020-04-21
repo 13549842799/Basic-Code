@@ -70,7 +70,7 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
-		logger.info("判断登录问题类型,返回json");
+		logger.info("判断登录问题类型,返回json:" + request.getMethod() + ":" + request.getHeader("Access-Control-Allow-Origin"));
 		if (authException instanceof InsufficientAuthenticationException) {
 			strategy.sendResponse(request, response, RespParams.create(request, response).ReLogin());
 			logger.info("InsufficientAuthenticationException");
