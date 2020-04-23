@@ -272,6 +272,7 @@ public abstract class HttpUtil {
     	result.setMessage(params.getErrorMessage());
     	result.setData(params.getContent());
         resp.addHeader("Access-Control-Allow-Origin", params.getReq().getHeader("Origin"));
+        resp.addHeader("Access-Control-Allow-Headers", "*");
 		resp.getWriter().print(JSONObject.toJSON(result));
 		resp.getWriter().flush();
         

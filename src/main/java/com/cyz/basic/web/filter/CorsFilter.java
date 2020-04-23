@@ -1,4 +1,4 @@
-package com.cyz.basic.web;
+package com.cyz.basic.web.filter;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +30,6 @@ public class CorsFilter implements Filter {
         allowCredentials = params.get("allowCredentials");
         allowHeaders = params.get("allowHeaders");
         exposeHeaders = params.get("exposeHeaders");
-        System.out.println(allowOrigin);
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -64,7 +63,7 @@ public class CorsFilter implements Filter {
             response.setHeader("Access-Control-Allow-Credentials", allowCredentials);
         }
         if (StrUtil.isNotEmpty(allowHeaders)) {
-            response.setHeader("Access-Control-Allow-Headers", allowHeaders);
+            response.setHeader("Access-Control-Allow-Headers", "*");
         }
         if (StrUtil.isNotEmpty(exposeHeaders)) {
             response.setHeader("Access-Control-Expose-Headers", exposeHeaders);

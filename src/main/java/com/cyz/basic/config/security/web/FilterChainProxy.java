@@ -20,6 +20,8 @@ import com.cyz.basic.config.security.core.context.SecurityContextHolder;
 import com.cyz.basic.config.security.web.firewall.FirewalledRequest;
 import com.cyz.basic.config.security.web.firewall.HttpFirewall;
 import com.cyz.basic.config.security.web.firewall.StrictHttpFirewall;
+import com.cyz.basic.util.HttpUtil;
+import com.cyz.basic.util.HttpUtil.RespParams;
 
 
 /**
@@ -193,11 +195,19 @@ public class FilterChainProxy extends GenericFilterBean{
 
 			return;
 		}
+		System.out.println(fwRequest.getRequestURI()+fwRequest.getMethod());
 		Object attr = fwRequest.getAttribute("NoMapperAttr");
 		if (attr != null || fwRequest.getMethod().equals("OPTIONS")) {
 			chain.doFilter(fwRequest, fwResponse);
+			fwRequest.reset();
 			return;
 		}
+		
+		/*if (fwRequest.getMethod().equals("OPTIONS")) {
+			fwResponse.addHeader("Access-Control-Allow-Origin", fwRequest.getHeader("Origin"));
+			fwResponse.getWriter().flush();
+			return;
+		}*/
 	
 		VirtualFilterChain vfc = new VirtualFilterChain(fwRequest, chain, filters);
 		vfc.doFilter(fwRequest, fwResponse);

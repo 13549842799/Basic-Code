@@ -14,7 +14,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.context.request.RequestContextListener;
 
 import com.cyz.basic.valid.service.ValidService;
-import com.cyz.basic.web.CorsFilter;
+import com.cyz.basic.web.filter.CorsFilter;
 
 @Configuration
 public class SpringConfiguration {
@@ -36,7 +36,7 @@ public class SpringConfiguration {
         //UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         //CorsConfiguration config = new CorsConfiguration();
         Map<String, String> params = new HashMap<String, String>();
-        params.put("allowOrigin", "http://localhost:8083");
+        params.put("allowOrigin", "http://localhost:8084");
         params.put("allowMethods", "GET,POST,PUT,DELETE,OPTIONS,PATCH");
         params.put("allowCredentials", "true");
         params.put("allowHeaders", "Content-Type,X-user,X-token");
