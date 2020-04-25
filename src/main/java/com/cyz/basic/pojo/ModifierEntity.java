@@ -43,6 +43,9 @@ public abstract class ModifierEntity<T> extends CreatorEntity<T> {
 		this.modifyTime = modifyTime;
 	}
 	
-	
+	public void update(Integer modifier) {
+		this.modifier = modifier;
+		this.modifyTime = LocalDateTime.now();
+	}
 
 }
