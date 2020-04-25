@@ -3,34 +3,36 @@ package com.cyz.basic.pojo;
 import java.time.LocalDateTime;
 
 @SuppressWarnings("serial")
-public abstract class ModifyEntity<T> extends CreatorEntity<T> {
+public abstract class ModifierEntity<T> extends CreatorEntity<T> {
 	
-	protected Integer modify;
+	protected Integer modifier;
 	
 	protected LocalDateTime modifyTime;
 	
 	
 
-	public ModifyEntity() {
+	public ModifierEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public ModifyEntity(T id, Byte delflag) {
+	public ModifierEntity(T id, Byte delflag) {
 		super(id, delflag);
 		// TODO Auto-generated constructor stub
 	}
 
-	public ModifyEntity(T id) {
+	public ModifierEntity(T id) {
 		super(id);
 	}
 
-	public Integer getModify() {
-		return modify;
+	
+
+	public Integer getModifier() {
+		return modifier;
 	}
 
-	public void setModify(Integer modify) {
-		this.modify = modify;
+	public void setModifier(Integer modifier) {
+		this.modifier = modifier;
 	}
 
 	public LocalDateTime getModifyTime() {
