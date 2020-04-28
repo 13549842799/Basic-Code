@@ -1,5 +1,7 @@
 package com.cyz.basic.pojo;
 
+import com.cyz.basic.enumeration.DeleteFlag;
+
 @SuppressWarnings("serial")
 public abstract class DeleteAbleEntity<T> extends IdEntity<T> {
 	
@@ -28,6 +30,8 @@ public abstract class DeleteAbleEntity<T> extends IdEntity<T> {
 		this.delflag = delflag;
 	}
 	
-	
+	public void delflag() {
+		setDelflag(DeleteFlag.VALID.getCode());
+	}
 
 }

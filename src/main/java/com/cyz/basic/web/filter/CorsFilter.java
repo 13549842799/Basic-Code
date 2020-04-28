@@ -46,7 +46,6 @@ public class CorsFilter implements Filter {
         if (request.getMethod().equals("OPTIONS")) {
         	response.setStatus(HttpServletResponse.SC_OK);
         }
-        System.out.println(allowOrigin+":" +request.getMethod());
         if (StrUtil.isNotEmpty(allowOrigin)) {
             List<String> allowOriginList = Arrays.asList(allowOrigin.split(","));
             if (null!=allowOriginList && allowOriginList.size()!=0) {

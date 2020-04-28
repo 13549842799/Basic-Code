@@ -1,5 +1,8 @@
 package com.cyz.basic.util;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 import org.springframework.util.StringUtils;
@@ -14,6 +17,10 @@ public abstract class StrUtil extends StringUtils {
 	
 	private static Pattern numericPattern = Pattern.compile("^[-\\+]?[\\d.]*$"); 
 	private static final Pattern special = Pattern.compile("\\s*|\t|\r|\n");
+	
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY年MM月dd日");
+	
+	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
     
 	 /**
      * 移除文本中的隐藏字符，包括换行符等
@@ -44,6 +51,10 @@ public abstract class StrUtil extends StringUtils {
             return numericPattern.matcher(src).matches();
         }
         return return_value;
+    }
+    
+    public static String formatDate(LocalDate date) {
+    	return date.format(dateTimeFormatter);
     }
 	
 }

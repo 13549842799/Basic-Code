@@ -93,6 +93,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 			logger.debug("Chain processed normally");
 		}
 		catch (IOException ex) {
+			logger.info("发生IO异常");
 			throw ex;
 		}
 		catch (Exception ex) {
