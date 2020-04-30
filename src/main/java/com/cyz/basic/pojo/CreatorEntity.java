@@ -40,5 +40,8 @@ public abstract class CreatorEntity<T> extends DeleteAbleEntity<T> {
 		this.createTime = createTime;
 	}
 	
-   
+    public void create(Integer userId) {
+    	this.creator = userId;
+    	this.createTime = LocalDateTime.now();
+    }
 }
