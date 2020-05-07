@@ -5,18 +5,23 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.web.context.request.RequestContextListener;
 
+import com.cyz.basic.util.UpLoadUtil;
+import com.cyz.basic.util.UpLoadUtil.UploadProperties;
 import com.cyz.basic.valid.service.ValidService;
 import com.cyz.basic.web.filter.CorsFilter;
 
 @Configuration
+@EnableConfigurationProperties(value={UploadProperties.class})
 public class SpringConfiguration {
 	
 	/**
@@ -36,7 +41,7 @@ public class SpringConfiguration {
         //UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         //CorsConfiguration config = new CorsConfiguration();
         Map<String, String> params = new HashMap<String, String>();
-        params.put("allowOrigin", "http://localhost:8084");
+        params.put("allowOrigin", "http://localhost:8084,http://localhost:8083");
         params.put("allowMethods", "GET,POST,PUT,DELETE,OPTIONS,PATCH");
         params.put("allowCredentials", "true");
         params.put("allowHeaders", "Content-Type,X-user,X-token");
@@ -68,6 +73,17 @@ public class SpringConfiguration {
 	@Bean
 	public ValidService validService() {
 		return new ValidService();
+	}
+	
+	@Bean(name="uploadUtil")
+	public UpLoadUtil upLoadUtil(UploadProperties properties){ 
+		System.out.println("进行初始化uploadUtil");
+		return new UpLoadUtil(properties);
+	}
+	
+	@Bean 
+	public BufferedImageHttpMessageConverter bufferedImageHttpMessageConverter(){ 
+		return new BufferedImageHttpMessageConverter();
 	}
 	
 	public static class SpringMessageSource {

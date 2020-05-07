@@ -2,6 +2,8 @@ package com.cyz.basic.pojo;
 
 import java.time.LocalDateTime;
 
+import com.cyz.basic.util.StrUtil;
+
 @SuppressWarnings("serial")
 public abstract class ModifierEntity<T> extends CreatorEntity<T> {
 	
@@ -48,4 +50,7 @@ public abstract class ModifierEntity<T> extends CreatorEntity<T> {
 		this.modifyTime = LocalDateTime.now();
 	}
 
+	public String getModifyTimeStr() {
+		return modifyTime != null ? StrUtil.formatDate(modifyTime) : "";
+	}
 }
