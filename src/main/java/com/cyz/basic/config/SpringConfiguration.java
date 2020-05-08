@@ -41,7 +41,7 @@ public class SpringConfiguration {
         //UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         //CorsConfiguration config = new CorsConfiguration();
         Map<String, String> params = new HashMap<String, String>();
-        params.put("allowOrigin", "http://localhost:8084,http://localhost:8083");
+        params.put("allowOrigin", "http://localhost:8084,http://localhost:8083,http://localhost");
         params.put("allowMethods", "GET,POST,PUT,DELETE,OPTIONS,PATCH");
         params.put("allowCredentials", "true");
         params.put("allowHeaders", "Content-Type,X-user,X-token");
