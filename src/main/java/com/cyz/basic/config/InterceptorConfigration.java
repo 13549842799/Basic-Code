@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 
 import com.cyz.basic.web.interceptor.MyInterceptor;
 
-@Configuration
+//@Configuration
 public class InterceptorConfigration extends WebMvcConfigurationSupport {
 	
     @Bean 
