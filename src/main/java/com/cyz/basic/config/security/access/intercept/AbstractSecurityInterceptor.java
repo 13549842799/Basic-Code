@@ -96,7 +96,7 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean, A
 		}
 		
 		Authentication authenticated = authenticateIfRequired();
-		
+		authenticated.getAuthorities().forEach(a -> System.out.println(a.getAuthority()));
 		// Attempt authorization
 		try {
 			this.accessDecisionManager.decide(authenticated, object, attributes);

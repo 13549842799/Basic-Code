@@ -10,11 +10,9 @@ public interface BasicService<T> {
 	void add(T t) throws AddErrorException;
      
 	/**
-	 * ¼Ì³ĞÁËIdEntityµÄÊµÌåÀàµÄÌí¼Ó·½·¨£¬
-	 * ÒòÎªIdEntityÖĞÊÇ·ºĞÍµÄid£¬ËùÒÔ»ñÈ¡×ÔÔöÖ÷¼üµÄÊ±ºòidµÄÀàĞÍ»áÓĞÎÊÌâµ¼ÖÂµ÷ÓÃget·½·¨³ö´í
-	 * ËùÒÔÖØĞÂÉèÖÃÁËidµÄÀàĞÍ
-	 * @param t ±£´æµÄÊµÌå
-	 * @param cls idµÄÀàĞÍµÄclass
+	 * æ·»åŠ 
+	 * @param t
+	 * @param cls è‡ªåŠ¨æ–°å¢çš„idçš„ç±»å‹
 	 * @throws AddErrorException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -31,21 +29,21 @@ public interface BasicService<T> {
 	};
 	
 	/**
-	 * ±äÁ¿¸üĞÂ
+	 * æ›´æ–°
 	 * @param t
-	 * @return 1-³É¹¦¸üĞÂ  0-Ã»ÓĞ¸üĞÂ  -1-¸üĞÂ¶àÌõ
+	 * @return 
 	 */
 	int update(T t);
 	
 	/**
-	 * È«Á¿¸üĞÂ
+	 *å…¨å­—æ®µæ›´æ–°æ–¹æ³•
 	 * @param t
-	 * @return 1-³É¹¦¸üĞÂ  0-Ã»ÓĞ¸üĞÂ  -1-¸üĞÂ¶àÌõ
+	 * @return 
 	 */
 	int updateFull(T t);
 	
 	/**
-	 * É¾³ı¼ÇÂ¼
+	 * åˆ é™¤æ–¹æ³•
 	 * @param id
 	 * @return
 	 */

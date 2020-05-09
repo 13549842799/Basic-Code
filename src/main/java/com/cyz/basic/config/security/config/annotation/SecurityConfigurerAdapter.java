@@ -63,6 +63,7 @@ public abstract class SecurityConfigurerAdapter <O, B extends SecurityBuilder<O>
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T> T postProcess(T object) {
+	
 		return (T) this.objectPostProcessor.postProcess(object);
 	}
 

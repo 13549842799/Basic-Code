@@ -96,11 +96,7 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
 		return result;
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		super.finalize();
-	}
+	
 
 	@Override
 	public void eraseCredentials() {
