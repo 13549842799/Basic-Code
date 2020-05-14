@@ -18,6 +18,8 @@ public abstract class StrUtil extends StringUtils {
 	private static Pattern numericPattern = Pattern.compile("^[-\\+]?[\\d.]*$"); 
 	private static final Pattern special = Pattern.compile("\\s*|\t|\r|\n");
 	
+	private static final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy年MM月");
+	
 	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
 	
 	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss");
@@ -55,6 +57,10 @@ public abstract class StrUtil extends StringUtils {
     
     public static String formatDate(LocalDate date) {
     	return date.format(dateFormatter);
+    }
+    
+    public static String formatMonth(LocalDate date) {
+    	return date.format(monthFormatter);
     }
     
     public static String formatDate(LocalDateTime time) {
