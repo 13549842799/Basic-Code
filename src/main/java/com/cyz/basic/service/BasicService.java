@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import com.cyz.basic.Exception.AddErrorException;
 import com.cyz.basic.pojo.IdEntity;
 
-public interface BasicService<T> {
+public interface BasicService<T, V> {
 	 
 	void add(T t) throws AddErrorException;
      
@@ -15,12 +15,11 @@ public interface BasicService<T> {
 	 * @param cls 自动新增的id的类型
 	 * @throws AddErrorException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	default void add(T t,  Class cls) throws AddErrorException {
+	default void add(T t,  Class<V> cls) throws AddErrorException {
 		add(t);
-		if (t instanceof IdEntity) {
+		if (t instanceof IdEntity<V> entity) {
 			try {
-				((IdEntity<?>)t).mainTainId(cls);
+				entity.mainTainId(cls);
 			} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
 					| IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();

@@ -17,7 +17,7 @@ import com.cyz.basic.service.support.BasicServiceSupport;
  *
  * @param <T>
  */
-public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T>{
+public abstract class BasicServiceImplTemplate<T, V> extends BasicServiceSupport<T, V>{
 	
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -29,10 +29,13 @@ public abstract class BasicServiceImplTemplate<T> extends BasicServiceSupport<T>
 	 * @return
 	 * @throws Exception
 	 */
-	public T getById(long id) {
-		T t = this.newEntity(); 
-		Assert.isAssignable(IdEntity.class, t.getClass(), "when you use this method， you have to extend the IdEntity");
-		((IdEntity<?>)t).acceptId(id);			
+	public T getById(V id) {
+		T t = this.newEntity();
+		if (t instanceof IdEntity<V> entity) {
+			entity.setId(id);
+		} else {
+			Assert.isAssignable(IdEntity.class, t.getClass(), "when you use this method， you have to extend the IdEntity");	
+		}	
 		return this.get(t);	
 	}
 	

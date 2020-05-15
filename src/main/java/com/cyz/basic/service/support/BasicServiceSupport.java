@@ -17,7 +17,7 @@ import com.cyz.basic.service.BasicService;
  *
  * @param <T>
  */
-public abstract class BasicServiceSupport<T>  implements BasicService<T>{
+public abstract class BasicServiceSupport<T, V>  implements BasicService<T, V>{
     
 	@Autowired
 	protected BasicMapper<T> basicMapper;
@@ -78,10 +78,9 @@ public abstract class BasicServiceSupport<T>  implements BasicService<T>{
 		fullDeleteSign(t, DeleteFlag.DELETE.getCode()); 
 	}
 	
-	@SuppressWarnings("rawtypes")
 	private void fullDeleteSign(T t, byte delflag) {
-		if (t instanceof DeleteAbleEntity) {
-			((DeleteAbleEntity)t).setDelflag(delflag);
+		if (t instanceof DeleteAbleEntity<V> entity) {
+			entity.setDelflag(delflag);
 		}
 	}
 	

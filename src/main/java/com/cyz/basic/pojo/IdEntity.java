@@ -25,7 +25,8 @@ public abstract class IdEntity<T> implements Serializable{
 		this.id = id;
 	}
 	
-	public abstract void acceptId(long id);
+	@Deprecated
+	public void acceptId(long id) {}
 	
 	@SuppressWarnings("unchecked")
 	public T mainTainId (Class<T> cls) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
