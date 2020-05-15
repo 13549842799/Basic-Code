@@ -20,6 +20,8 @@ public abstract class StrUtil extends StringUtils {
 	
 	private static final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy年MM月");
 	
+	private static final DateTimeFormatter monthDateFormatter = DateTimeFormatter.ofPattern("MM月dd日");
+	
 	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
 	
 	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss");
@@ -61,6 +63,10 @@ public abstract class StrUtil extends StringUtils {
     
     public static String formatMonth(LocalDate date) {
     	return date.format(monthFormatter);
+    }
+    
+    public static String formatMonthDate(LocalDate date) {
+    	return date.format(monthDateFormatter);
     }
     
     public static String formatDate(LocalDateTime time) {

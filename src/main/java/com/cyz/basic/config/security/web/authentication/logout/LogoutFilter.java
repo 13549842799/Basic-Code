@@ -76,7 +76,7 @@ public class LogoutFilter extends GenericFilterBean {
 			
 			handler.logout(request, response, auth);
 			
-			logoutSuccessHandler.onLogoutSuccess(request, response, auth);
+			logoutSuccessHandler.onLogoutSuccess(request, response, null);
 		}
 		
 		chain.doFilter(request, response);

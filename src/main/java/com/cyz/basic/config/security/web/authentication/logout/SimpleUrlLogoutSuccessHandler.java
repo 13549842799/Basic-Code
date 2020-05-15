@@ -19,7 +19,7 @@ public class SimpleUrlLogoutSuccessHandler extends AbstractAuthenticationTargetU
 
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
-		super.handle(request, response, authentication);
+		super.handle(request, response, null);
 	}
 
 }
