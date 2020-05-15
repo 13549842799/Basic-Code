@@ -82,6 +82,19 @@
 	    <version>1.2.7</version>
 	</dependency>
 	
+	<dependency>
+        <groupId>com.google.zxing</groupId>
+        <artifactId>core</artifactId>
+        <version>3.3.0</version>
+    </dependency>
+
+	<dependency>
+	    <groupId>net.glxn</groupId>
+	    <artifactId>qrgen</artifactId>
+	    <version>1.4</version>
+	</dependency>
+
+	
 	<!-- mybatis分页插件 -->
     <!-- <dependency>
         <groupId>com.github.pagehelper</groupId>
@@ -102,9 +115,12 @@
             <groupId>org.springframework.boot</groupId>  
             <artifactId>spring-boot-maven-plugin</artifactId>  
             <configuration>  
-                <classifier>exec</classifier>  
+                <classifier>exec</classifier>
+                <release>14</release>
+		        <compilerArgs>--enable-preview</compilerArgs>
             </configuration>  
-        </plugin>  
+        </plugin> 
+        <!-- 下面的配置，是用于java14的预览模式的，因为预览模式默认禁止，如果不开启它，将会无法打包成功  --> 
     </plugins>  
 </build>
   

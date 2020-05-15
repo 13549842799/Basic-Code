@@ -77,7 +77,6 @@ public class SpringConfiguration {
 	
 	@Bean(name="uploadUtil")
 	public UpLoadUtil upLoadUtil(UploadProperties properties){ 
-		System.out.println("进行初始化uploadUtil");
 		return new UpLoadUtil(properties);
 	}
 	
