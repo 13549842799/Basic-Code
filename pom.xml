@@ -116,10 +116,15 @@
             <artifactId>spring-boot-maven-plugin</artifactId>  
             <configuration>  
                 <classifier>exec</classifier>
-                <release>14</release>
-		        <compilerArgs>--enable-preview</compilerArgs>
             </configuration>  
-        </plugin> 
+        </plugin>
+        <plugin>
+		    <artifactId>maven-compiler-plugin</artifactId>
+		    <configuration>
+		        <release>14</release>
+		        <compilerArgs>--enable-preview</compilerArgs>
+		    </configuration>
+		</plugin>
         <!-- 下面的配置，是用于java14的预览模式的，因为预览模式默认禁止，如果不开启它，将会无法打包成功  --> 
     </plugins>  
 </build>
