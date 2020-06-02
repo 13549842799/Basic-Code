@@ -208,8 +208,8 @@ public static volatile  PackageUtil util = null;
         return methodSet;
     }
     
-    public static Set<Class> findAnnotationClasss(String fullClassName, Class<? extends Annotation> anno) throws ClassNotFoundException {
-        Set<Class> methodSet = new HashSet<Class>();
+    public static Set<Class<? extends Object>> findAnnotationClasss(String fullClassName, Class<? extends Annotation> anno) throws ClassNotFoundException {
+        Set<Class<? extends Object>> methodSet = new HashSet<Class<? extends Object>>();
         Class<?> clz = Class.forName(fullClassName);
         methodSet.add(clz);
         return methodSet;
